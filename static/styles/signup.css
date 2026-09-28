@@ -40,7 +40,6 @@ body {
 
 .input-group label {
     color: #999999;
-    font-family: "Space Mono", monospace;
     font-size: 10px;
     letter-spacing: 2px;
     margin-bottom: 9px;
@@ -97,7 +96,6 @@ body {
 .login-text {
     color: #666666;
     text-align: center;
-    font-family: "Space Mono", monospace;
     font-size: 14px;
     line-height: 1.7;
     margin-top: 25px;
