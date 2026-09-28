@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PEN-TEST | Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/login.css') }}">
+
+</head>
+
+<body>
+    <div class="login-box">
+        <p class="login-label">// AUTHENTICATION</p>
+        <h1>LOGIN</h1>
+
+        <form>
+            <div class="input-group">
+                <label for="username">USERNAME</label>
+                <input type="text" id="username" name="username">
+            </div>
+
+            <div class="input-group">
+                <label for="password">PASSWORD</label>
+                <input type="password" id="password" name="password">
+            </div>
+
+            <button type="submit">LOGIN →</button>
+        </form>
+
+        <p class="signup-text">
+            Don't have an account?
+            <a href="{{ url_for('signup') }}">Create one</a>
+        </p>
+
+    </div>
+</body>
+
+</html>
