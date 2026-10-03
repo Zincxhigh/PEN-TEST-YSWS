@@ -14,7 +14,7 @@
         <p class="login-label">// AUTHENTICATION</p>
         <h1>LOGIN</h1>
 
-        <form>
+        <form action="{{ url_for('login') }}" method="POST">
             <div class="input-group">
                 <label for="username">USERNAME</label>
                 <input type="text" id="username" name="username">
