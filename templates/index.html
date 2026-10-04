@@ -31,6 +31,7 @@
             <a href="#faq">FAQ</a>
             {% if current_user.is_authenticated %}
             <form action="{{ url_for('logout') }}" method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <button type="submit">Logout</button>
             </form>
             {% endif %}
