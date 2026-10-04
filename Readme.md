@@ -31,3 +31,15 @@ We focus on various areas including:
 Interested in joining? We meet regularly to brainstorm ideas, share knowledge, and work on our next big project. Whether you're a beginner or experienced, there's a place for you in PEN-TEST.
 
 **Let's secure the future, together.**
+
+## Running locally
+
+Install requirements, set `SECRET_KEY` to a persistent random secret (generate one with
+`python -c "import secrets; print(secrets.token_hex(32))"`), then run:
+
+```sh
+python main.py
+```
+
+Keep the same `SECRET_KEY` across restarts/workers and do not commit it.
+For HTTPS hosting, set `COOKIE_SECURE=1`.
