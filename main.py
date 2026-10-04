@@ -132,23 +132,6 @@ def signup():
 
     return render_template("signup.html")
 
-@app.route('/debug/users')
-def debug_users():
-    users = db.session.execute(db.select(User)).scalars().all()
-
-    return {
-        "count": len(users),
-        "users": [
-            {
-                "id": user.id,
-                "username": user.username,
-                "email": user.email,
-                "password": user.password
-            }
-            for user in users
-        ]
-    }
-
 @app.route('/logout', methods=['POST'])
 def logout():
     logout_user()
