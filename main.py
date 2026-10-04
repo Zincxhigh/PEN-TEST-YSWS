@@ -1,6 +1,7 @@
 from sqlite3.dbapi2 import SQLITE_ABORT
 from argon2 import PasswordHasher
 from argon2.exceptions import InvalidHashError, VerificationError, VerifyMismatchError
+from email_validator import EmailNotValidError, validate_email
 
 from flask import Flask, render_template, request, flash, redirect, url_for, session
 import os
@@ -80,9 +81,31 @@ def login():
 @app.route("/signup", methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
-        sUsername = request.form['username']
-        sEmail = request.form['email']
-        sPassword = request.form['password']
+        sUsername = request.form.get('username', '').strip()
+        sEmail = request.form.get('email', '').strip()
+        sPassword = request.form.get('password', '')
+        if (not sUsername or len(sUsername) > 80 or not sEmail or len(sEmail) > 120
+                or not sPassword or len(sPassword) > 1024):
+            flash("Enter a username (up to 80 characters), email (up to 120), and password (up to 1024).")
+            return redirect(url_for('signup'))
+        if sPassword != request.form.get('confirm-password'):
+            flash("Passwords do not match.")
+            return redirect(url_for('signup'))
+        try:
+            sEmail = validate_email(sEmail, check_deliverability=False).normalized.lower()
+        except EmailNotValidError:
+            flash("Enter a valid email address.")
+            return redirect(url_for('signup'))
+        if len(sEmail) > 120:
+            flash("Email must be at most 120 characters.")
+            return redirect(url_for('signup'))
+
+        existing = db.session.execute(db.select(User.id).where(
+            (User.username == sUsername) | (db.func.lower(User.email) == sEmail)
+        )).first()
+        if existing:
+            flash("Username or email already registered.")
+            return redirect(url_for('signup'))
 
         user = User(
             username=sUsername,
