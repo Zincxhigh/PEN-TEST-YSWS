@@ -7,6 +7,7 @@ from flask import Flask, render_template, request, flash, redirect, url_for, ses
 import os
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 app = Flask(__name__)
 
@@ -116,8 +117,14 @@ def signup():
             db.session.add(user)
             db.session.commit()
 
-        except Exception as e:
+        except IntegrityError:
             db.session.rollback()
+            flash("Username or email already registered.")
+            return redirect(url_for('signup'))
+        except SQLAlchemyError:
+            db.session.rollback()
+            app.logger.exception("Account creation failed")
+            flash("Account creation failed. Please try again.")
             return redirect(url_for('signup'))
 
         flash("Account created successfully!")
