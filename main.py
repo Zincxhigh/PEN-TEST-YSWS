@@ -2,9 +2,10 @@ from sqlite3.dbapi2 import SQLITE_ABORT
 from argon2 import PasswordHasher
 from argon2.exceptions import InvalidHashError, VerificationError, VerifyMismatchError
 
-from flask import Flask, render_template, request, flash, redirect, url_for
+from flask import Flask, render_template, request, flash, redirect, url_for, session
 import os
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager, UserMixin, login_user, logout_user
 
 app = Flask(__name__)
 
@@ -15,8 +16,9 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 ph = PasswordHasher()
 dummy_hash = ph.hash(os.urandom(32))
+login_manager = LoginManager(app)
 
-class User(db.Model):
+class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(
         db.String(80),
@@ -34,6 +36,14 @@ class User(db.Model):
         db.String(128),
         nullable=False
     )
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    try:
+        return db.session.get(User, int(user_id))
+    except ValueError:
+        return None
 
 
 @app.route('/')
@@ -57,6 +67,8 @@ def login():
                 app.logger.exception("Invalid stored password hash")
 
         if verified:
+            session.clear()
+            login_user(user)
             flash("Login successful")
             return redirect(url_for('index'))
         else:
@@ -106,6 +118,12 @@ def debug_users():
             for user in users
         ]
     }
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    logout_user()
+    session.clear()
+    return redirect(url_for('login'))
 
 if __name__ == '__main__':
     with app.app_context():

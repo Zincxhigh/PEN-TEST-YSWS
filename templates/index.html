@@ -28,6 +28,11 @@
             <a href="#explore">Explore</a>
             <a href="#how-it-works">How It Works</a>
             <a href="#faq">FAQ</a>
+            {% if current_user.is_authenticated %}
+            <form action="{{ url_for('logout') }}" method="post">
+                <button type="submit">Logout</button>
+            </form>
+            {% endif %}
         </div>
 
         
