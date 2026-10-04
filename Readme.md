@@ -38,9 +38,12 @@ Install requirements, set `SECRET_KEY` to a persistent random secret (generate o
 `python -c "import secrets; print(secrets.token_hex(32))"`), then run:
 
 ```sh
+flask --app main init-db
 python main.py
 ```
 
+`init-db` creates missing tables; it does not alter existing tables or accounts.
+Run it before starting `flask run` or a WSGI server against a fresh database.
 Keep the same `SECRET_KEY` across restarts/workers and do not commit it.
 For HTTPS hosting, set `COOKIE_SECURE=1`. Rate limits use memory per process by
 default; multiple workers need a shared `RATELIMIT_STORAGE_URI` and the matching

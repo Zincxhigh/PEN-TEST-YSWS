@@ -61,6 +61,11 @@ def load_user(user_id):
         return None
 
 
+@app.cli.command("init-db")
+def init_db():
+    db.create_all()
+
+
 @app.route('/')
 @app.route('/index')
 def index():
