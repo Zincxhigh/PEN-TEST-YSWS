@@ -42,4 +42,7 @@ python main.py
 ```
 
 Keep the same `SECRET_KEY` across restarts/workers and do not commit it.
-For HTTPS hosting, set `COOKIE_SECURE=1`.
+For HTTPS hosting, set `COOKIE_SECURE=1`. Rate limits use memory per process by
+default; multiple workers need a shared `RATELIMIT_STORAGE_URI` and the matching
+Flask-Limiter storage dependency. Client IPs come from the direct connection;
+proxy deployments must configure trusted forwarding for their actual proxy setup.

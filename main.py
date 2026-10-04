@@ -8,6 +8,8 @@ import os
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user
 from flask_wtf.csrf import CSRFProtect
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 app = Flask(__name__)
@@ -17,6 +19,7 @@ if not app.config["SECRET_KEY"]:
     raise RuntimeError("Set SECRET_KEY to a random secret before starting the app.")
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 app.config["SESSION_COOKIE_SECURE"] = os.environ.get("COOKIE_SECURE") == "1"
+app.config["MAX_CONTENT_LENGTH"] = 16 * 1024
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///project.db")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
@@ -25,6 +28,10 @@ ph = PasswordHasher()
 dummy_hash = ph.hash(os.urandom(32))
 CSRFProtect(app)
 login_manager = LoginManager(app)
+limiter = Limiter(
+    get_remote_address, app=app,
+    storage_uri=os.environ.get("RATELIMIT_STORAGE_URI", "memory://")
+)
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -60,6 +67,7 @@ def index():
     return render_template('index.html')
 
 @app.route('/login', methods=['GET', 'POST'])
+@limiter.limit("10 per minute", methods=["POST"])
 def login():
     if request.method == 'POST':
         sUsername = request.form.get('username', '').strip()
@@ -86,6 +94,7 @@ def login():
     return render_template('login.html')
 
 @app.route("/signup", methods=['GET', 'POST'])
+@limiter.limit("5 per minute", methods=["POST"])
 def signup():
     if request.method == 'POST':
         sUsername = request.form.get('username', '').strip()
