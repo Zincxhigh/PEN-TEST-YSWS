@@ -2,4 +2,5 @@ Flask
 flask-sqlalchemy
 flask-login
 argon2-cffi
+Flask-WTF
 email-validator

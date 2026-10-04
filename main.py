@@ -7,6 +7,7 @@ from flask import Flask, render_template, request, flash, redirect, url_for, ses
 import os
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user
+from flask_wtf.csrf import CSRFProtect
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 app = Flask(__name__)
@@ -22,6 +23,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 ph = PasswordHasher()
 dummy_hash = ph.hash(os.urandom(32))
+CSRFProtect(app)
 login_manager = LoginManager(app)
 
 class User(db.Model, UserMixin):
