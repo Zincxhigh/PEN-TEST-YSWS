@@ -31,3 +31,24 @@ We focus on various areas including:
 Interested in joining? We meet regularly to brainstorm ideas, share knowledge, and work on our next big project. Whether you're a beginner or experienced, there's a place for you in PEN-TEST.
 
 **Let's secure the future, together.**
+
+## Running locally
+
+Install requirements, set `SECRET_KEY` to a persistent random secret (generate one with
+`python -c "import secrets; print(secrets.token_hex(32))"`), then run:
+
+```sh
+flask --app main init-db
+python main.py
+```
+
+`init-db` creates missing tables; it does not alter existing tables or accounts.
+Run it before starting `flask run` or a WSGI server against a fresh database.
+Keep the same `SECRET_KEY` across restarts/workers and do not commit it.
+For HTTPS hosting, set `COOKIE_SECURE=1`. Rate limits use memory per process by
+default; multiple workers need a shared `RATELIMIT_STORAGE_URI` and the matching
+Flask-Limiter storage dependency. Client IPs come from the direct connection;
+proxy deployments must configure trusted forwarding for their actual proxy setup.
+
+The local `instance/` directory is ignored. Previously committed database copies
+remain in Git history; do not publish that history with real account data.
