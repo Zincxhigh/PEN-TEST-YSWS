@@ -5,3 +5,7 @@ venv/
 .env
 .data/
 *.log
+.venv/
+instance/
+.env
+__pycache__/

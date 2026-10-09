@@ -1,3 +1,9 @@
 Flask
 requests
 gunicorn
+flask-sqlalchemy
+flask-login
+argon2-cffi
+Flask-WTF
+Flask-Limiter
+email-validator

@@ -42,3 +42,23 @@ Setup:
 2. Generate an admin API token in the CTFd admin panel.
 3. Fill in `.env` (see `.env.example`): `HACKCLUB_CLIENT_ID`, `HACKCLUB_CLIENT_SECRET`, `APP_BASE_URL`, `CTFD_API_TOKEN`, `SECRET_KEY`.
 4. Check `/api/auth/status` to confirm both sides are configured.
+## Running locally
+
+Install requirements, set `SECRET_KEY` to a persistent random secret (generate one with
+`python -c "import secrets; print(secrets.token_hex(32))"`), then run:
+
+```sh
+flask --app main init-db
+python main.py
+```
+
+`init-db` creates missing tables; it does not alter existing tables or accounts.
+Run it before starting `flask run` or a WSGI server against a fresh database.
+Keep the same `SECRET_KEY` across restarts/workers and do not commit it.
+For HTTPS hosting, set `COOKIE_SECURE=1`. Rate limits use memory per process by
+default; multiple workers need a shared `RATELIMIT_STORAGE_URI` and the matching
+Flask-Limiter storage dependency. Client IPs come from the direct connection;
+proxy deployments must configure trusted forwarding for their actual proxy setup.
+
+The local `instance/` directory is ignored. Previously committed database copies
+remain in Git history; do not publish that history with real account data.
