@@ -1,0 +1,39 @@
+# Web challenges. Ports 5000-5002 (within 5000-5010).
+# Real flags/secrets come from the root .env (never distributed).
+# Deploy with real flags via: docker compose --env-file ../.env up --build -d
+# (plain `docker compose up --build -d` works too, with REDACTED placeholders)
+#   FLAG_SSTI, FLAG_JWT, FLAG_XSS, ADMIN_SECRET_XSS
+#
+# NOTE (xss): the admin bot only visits URLs on the APP_URL host, and its
+# cookie is scoped to that host. For remote hosting set e.g.
+#   APP_URL_XSS=https://xss.example.com
+# and report note URLs on that same host.
+services:
+  ssti:
+    build:
+      context: ./01-ssti
+      args:
+        FLAG: ${FLAG_SSTI:-pentest{REDACTED}}
+    ports:
+      - "5000:5000"
+
+  jwt:
+    build:
+      context: ./02-jwt
+      args:
+        FLAG: ${FLAG_JWT:-pentest{REDACTED}}
+    ports:
+      - "5001:5000"
+
+  xss:
+    build:
+      context: ./03-xss
+      args:
+        FLAG: ${FLAG_XSS:-pentest{REDACTED}}
+        ADMIN_SECRET: ${ADMIN_SECRET_XSS:-REDACTED}
+    ports:
+      - "5002:5000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      APP_URL: ${APP_URL_XSS:-http://127.0.0.1:5002}
