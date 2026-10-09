@@ -28,6 +28,7 @@
             <a href="#about">About</a>
             <a href="#explore">Explore</a>
             <a href="#how-it-works">How It Works</a>
+            <a href="#arena">Arena</a>
             <a href="#faq">FAQ</a>
             {% if current_user.is_authenticated %}
             <form action="{{ url_for('logout') }}" method="post">
@@ -37,7 +38,7 @@
             {% endif %}
         </div>
 
-        
+        <a href="/play" class="nav-button">ENTER CTF →</a>
     </nav>
      <img src="{{ url_for('static', filename='images/flag-orpheus-left.svg') }}"
                 alt="PEN-TEST - Escape Your Fate">
@@ -60,7 +61,7 @@
 
         <div class="hero-buttons">
             <a href="#join" class="button primary-button"> RSVP NOW → </a>
-            <a href="#explore" class="button secondary-button"> EXPLORE </a>
+            <a href="/play" class="button secondary-button">Enter CTF Arena</a>
         </div>
     </header>
 
@@ -247,6 +248,39 @@
     </section>
 
 
+    <section class="section" id="arena">
+        <div class="section-heading">
+            <h2>Enter the <strong>arena.</strong></h2>
+            <p>Challenges, scoreboard, and flags live on our CTFd instance.</p>
+        </div>
+
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">⚑</div>
+                <div>
+                    <h3>Play challenges</h3>
+                    <p>Web, crypto, forensics, OSINT and more — solve and capture flags.</p>
+                    <p><a href="{{ ctfd_url }}/challenges" target="_blank" rel="noopener" style="color:#ff3030;">{{ ctfd_url }}/challenges →</a></p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">≡</div>
+                <div>
+                    <h3>Climb the scoreboard</h3>
+                    <p>Watch rankings update live as players solve.</p>
+                    <p><a href="{{ ctfd_url }}/scoreboard" target="_blank" rel="noopener" style="color:#ff3030;">{{ ctfd_url }}/scoreboard →</a></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="hero-buttons" style="margin-top: 40px;">
+            <a href="/play" class="button primary-button">Enter CTF Arena →</a>
+            <a href="/register" class="button secondary-button">Register with Hack Club</a>
+        </div>
+        <p class="tool-note" id="ctfd-status">Checking arena status…</p>
+    </section>
+
+
     <section class="faq-section" id="faq">
         <div class="section-heading">
             <h2>FAQ</h2>
@@ -297,6 +331,13 @@
             </details>
 
             <details class="faq-item">
+                <summary>How do I register for the CTF?</summary>
+                <div class="faq-answer">
+                    <p> Hit <a href="/register">Register with Hack Club</a> — we use your Hack Club identity to create your CTF account and log you straight into the arena. </p>
+                </div>
+            </details>
+
+            <details class="faq-item">
                 <summary>Can I submit team projects?</summary>
                 <div class="faq-answer">
                     <p> No, sorry! </p>
@@ -313,13 +354,30 @@
             </p>
 
             <a href="https://rsvp.soon.it/pen-test" class="button primary-button"> RSVP NOW → </a>
+            <a href="/play" class="button secondary-button">Enter CTF Arena</a>
         </div>
     </section>
 
     <footer>
         <strong>PEN-TEST</strong>
-        <p>Made with ♡ by teens for teens</p>
+        <p>Made with ♡ by teens for teens · <a href="{{ ctfd_url }}" target="_blank" rel="noopener" style="color:#ff3030;">CTF Arena</a> · <span id="ctfd-footer-status">…</span></p>
     </footer>
+
+    <script>
+        fetch("/api/ctfd/status")
+            .then(r => r.json().then(b => ({ ok: r.ok, body: b })))
+            .then(({ ok, body }) => {
+                const msg = ok ? "● arena online" : "○ arena offline";
+                const el1 = document.getElementById("ctfd-status");
+                const el2 = document.getElementById("ctfd-footer-status");
+                if (el1) el1.textContent = msg + " — " + body.ctfd_url;
+                if (el2) { el2.textContent = msg; el2.style.color = ok ? "#3dff7a" : "#ff3030"; }
+            })
+            .catch(() => {
+                const el1 = document.getElementById("ctfd-status");
+                if (el1) el1.textContent = "○ arena status unknown";
+            });
+    </script>
 </body>
 
 </html>

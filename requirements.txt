@@ -1,4 +1,6 @@
 Flask
+requests
+gunicorn
 flask-sqlalchemy
 flask-login
 argon2-cffi

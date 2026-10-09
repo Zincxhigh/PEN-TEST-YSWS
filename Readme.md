@@ -32,6 +32,16 @@ Interested in joining? We meet regularly to brainstorm ideas, share knowledge, a
 
 **Let's secure the future, together.**
 
+## CTF registration (Hack Club Auth)
+
+The site registers players on CTFd using their Hack Club identity. Hit **Register with Hack Club** (`/register`): after Hack Club OAuth the server creates the CTFd account (username from the Hack Club name) with the default password, or resets it for returning players, logs them in, and shows the credentials with a prompt to change the password in CTFd Settings. Set `ARENA_DEFAULT_PASSWORD` in `.env` (empty = random one-time password shown once).
+
+Setup:
+
+1. Create an OAuth app at `auth.hackclub.com` (Developer Apps) with redirect URI `{APP_BASE_URL}/auth/hackclub/callback`.
+2. Generate an admin API token in the CTFd admin panel.
+3. Fill in `.env` (see `.env.example`): `HACKCLUB_CLIENT_ID`, `HACKCLUB_CLIENT_SECRET`, `APP_BASE_URL`, `CTFD_API_TOKEN`, `SECRET_KEY`.
+4. Check `/api/auth/status` to confirm both sides are configured.
 ## Running locally
 
 Install requirements, set `SECRET_KEY` to a persistent random secret (generate one with
