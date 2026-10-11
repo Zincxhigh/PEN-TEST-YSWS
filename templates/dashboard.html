@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PEN-TEST | Dashboard</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles/dashboard.css') }}"
+    />
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="{{ url_for('static', filename='logo.ico') }}"
+    />
+  </head>
+  <body>
+    {% include "_messages.html" %}
+    <nav class="navbar">
+      <a href="/" class="nav-logo">PEN-TEST</a>
+      <div class="nav-links">
+        <a href="#projects">PROJECTS</a>
+        <a href="#shop">SHOP</a>
+        <a href="#community">COMMUNITY</a>
+      </div>
+      <form action="" method="post">
+        <button class="logout" type="submit">LOGOUT</button>
+      </form>
+    </nav>
+
+    <main>
+      <section class="intro">
+        <div class="intro-grid">
+          <div>
+            <p class="tiny">WELCOME BACK, BUILDER</p>
+            <h1>
+              ESCAPE <span class="red">YOUR</span> FATE<span class="red">.</span>
+            </h1>
+            <a href="#mission" class="red-button">GUIDE</a>
+          </div>
+        </div>
+        <div class="status-strip">
+          <div>
+            <span>FLAGS</span>
+            <strong class="red">000</strong>
+          </div>
+          <div>
+            <span>PROJECTS</span>
+            <strong>000</strong>
+          </div>
+          <div>
+            <span>MISSIONS</span>
+            <strong class="purple">000</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="mission section" id="mission">
+        <div class="mission-layout">
+          <div class="mission-number">THIS<br />WEEK</div>
+          <div class="mission-main">
+            <p class="purple-text">WEB SECURITY / BEGINNER</p>
+            <h2>THE FIRST<br /><span>BREACH.</span></h2>
+            <p class="mission-copy">
+              Something is hiding in the system. Find it. Figure out why it
+              exists. Then learn how to stop it.
+            </p>
+            <div class="mission-details">
+              <span>+50 FLAGS</span>
+              <span>~30 MIN</span>
+              <span>BEGINNER</span>
+            </div>
+            <a href="#" class="red-button">ACCEPT MISSION →</a>
+          </div>
+          <div class="terminal">
+            <p>&gt; INITIALIZING...</p>
+            <p class="green">[OK] USER</p>
+            <p class="green">[OK] ACCESS</p>
+            <p class="green">[OK] DATABASE</p>
+            <p class="purple-text">[??] ESCAPE ROUTE</p>
+            <p>&gt; _</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="leaderboard section" id="community">
+        <div class="leaderboard-heading">
+          <h2>THE<br /><span>ESCAPERS.</span></h2>
+        </div>
+        <div class="leaderboard-list">
+          <div class="leaderboard-row header">
+            <span>#</span>
+            <span>BUILDER</span>
+            <span>STREAK</span>
+          </div>
+          <div class="leaderboard-row">
+            <span>01</span>
+            <strong>---</strong>
+            <b>000</b>
+          </div>
+          <div class="leaderboard-row">
+            <span>02</span>
+            <strong>---</strong>
+            <b>000</b>
+          </div>
+          <div class="leaderboard-row">
+            <span>03</span>
+            <strong>---</strong>
+            <b>000</b>
+          </div>
+          <div class="leaderboard-row">
+            <span>04</span>
+            <strong>---</strong>
+            <b>000</b>
+          </div>
+          <div class="leaderboard-row">
+            <span>05</span>
+            <strong>---</strong>
+            <b>000</b>
+          </div>
+        </div>
+      </section>
+
+      <section class="projects section" id="projects">
+        <div class="split-heading">
+          <h2>MAKE<br />SOMETHING<br /><span>WEIRD.</span></h2>
+          <div>
+            <p>
+              Your projects are the heart of PEN-TEST. Build whatever you're
+              curious about. Document what you learn.
+            </p>
+            <div class="project-links">
+              <a href="#" class="text-link">START A PROJECT →</a>
+              <a href="#mission" class="text-link">GUIDE →</a>
+              <a href="#projects" class="text-link">PROJECTS ↓</a>
+            </div>
+          </div>
+        </div>
+        <div class="project-lines">
+          <a href="#">
+            <span>01</span>
+            <div>
+              <small>SUBMISSION</small>
+              <strong>SHIP A PROJECT</strong>
+            </div>
+            <b>↗</b>
+          </a>
+        </div>
+      </section>
+
+      <section class="shop section" id="shop">
+        <div class="shop-heading">
+          <h2>EARN.<br /><span>UNLOCK.</span></h2>
+        </div>
+        <div class="shop-grid">
+          <a href="#" class="shop-item">
+            <div class="shop-image red-bg">STICKER</div>
+            <div class="shop-info">
+              <div>
+                <small>001</small>
+                <strong>PEN-TEST STICKER</strong>
+              </div>
+              <span>100 FLAGS</span>
+            </div>
+          </a>
+          <a href="#" class="shop-item">
+            <div class="shop-image purple-bg">CYBER<br />PACK</div>
+            <div class="shop-info">
+              <div>
+                <small>002</small>
+                <strong>CYBER PACK</strong>
+              </div>
+              <span>250 FLAGS</span>
+            </div>
+          </a>
+          <a href="#" class="shop-item">
+            <div class="shop-image white-bg">BUILDER</div>
+            <div class="shop-info">
+              <div>
+                <small>003</small>
+                <strong>BUILDER KIT</strong>
+              </div>
+              <span>500 FLAGS</span>
+            </div>
+          </a>
+        </div>
+        <a href="#" class="text-link shop-more">VIEW MORE →</a>
+      </section>
+
+      <section class="final">
+        <h2>READY TO<br /><span>ESCAPE?</span></h2>
+        <a href="#mission" class="red-button">GUIDE →</a>
+      </section>
+    </main>
+
+    <footer>
+      <strong>PEN-TEST</strong>
+      <p>MADE WITH ♡ BY TEENS, FOR TEENS</p>
+    </footer>
+  </body>
+</html>
