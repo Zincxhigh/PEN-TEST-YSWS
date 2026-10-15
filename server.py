@@ -13,6 +13,7 @@ try:
 except ImportError:
     requests = None
 
+
 def _load_dotenv(path):
     """Minimal .env loader (stdlib only) so `python server.py` / `make run`
     pick up the same values docker compose uses. Never overrides real env."""
@@ -66,6 +67,9 @@ def get_ctfd_url():
     """Public CTFd URL for this request (same server by default)."""
     if CTFD_URL_OVERRIDE:
         return CTFD_URL_OVERRIDE
+    # Prefer an explicit APP_BASE_URL when configured to avoid using Host header.
+    if APP_BASE_URL:
+        return APP_BASE_URL
     try:
         hostname = request.host.split(":")[0] or "localhost"
         scheme = os.environ.get("CTFD_SCHEME", "").strip() or request.scheme
@@ -300,7 +304,7 @@ def ctfd_find_user(email):
         except Exception:  # noqa: BLE001 - base unreachable, try next
             app.logger.info("ctfd api find: %s unreachable", base)
             continue
-        return None
+    # not found on any base
     return None
 
 
@@ -342,8 +346,13 @@ def provisioned_page(username, password, pw_note, cookies, outcome):
                 "(or use Forgot password there).</p>"
                 f'<p><a href="/">Back to PEN-TEST</a></p>')
     resp = make_response(f"<!doctype html><title>Arena account</title>{body}", 200)
+    secure_flag = False
+    try:
+        secure_flag = request.is_secure or (CTFD_SCHEME == "https")
+    except RuntimeError:
+        secure_flag = (CTFD_SCHEME == "https")
     for k, v in cookies.items():
-        resp.set_cookie(k, v, path="/", httponly=True)
+        resp.set_cookie(k, v, path="/", httponly=True, secure=secure_flag, samesite="Lax")
     return resp
 
 
@@ -366,7 +375,7 @@ def hackclub_callback():
         return auth_error("The 'requests' package isn't installed.", 500)
     if request.args.get("error"):
         return auth_error(f"Hack Club said: "
-                          f"{request.args.get('error_description') or request.args.get('error')}.", 400)
+                          f"{request.args.get('error_description') or request.args.get('error')}", 400)
     state, expected = request.args.get("state", ""), session.pop("hackclub_oauth_state", "")
     # Log booleans only, never secret values.
     app.logger.info("hackclub callback: session_cookie=%s state_param=%s state_match=%s",
@@ -382,7 +391,7 @@ def hackclub_callback():
         return auth_error("No authorization code returned.", 400)
     try:
         tok = requests.post(HACKCLUB_TOKEN_URL,
-                            json={"client_id": HACKCLUB_CLIENT_ID, "client_secret": HACKCLUB_CLIENT_SECRET,
+                            data={"client_id": HACKCLUB_CLIENT_ID, "client_secret": HACKCLUB_CLIENT_SECRET,
                                   "redirect_uri": hackclub_redirect_uri(), "code": code,
                                   "grant_type": "authorization_code"}, timeout=10)
         tok_body = tok.json() if tok.status_code < 300 else {}
