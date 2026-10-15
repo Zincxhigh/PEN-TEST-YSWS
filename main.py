@@ -4,7 +4,7 @@ if __name__ == "__main__":
     import os
 
     port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port, debug=True)
+    app.run(host="0.0.0.0", port=port, debug=False)
 from sqlite3.dbapi2 import SQLITE_ABORT
 from argon2 import PasswordHasher
 from argon2.exceptions import InvalidHashError, VerificationError, VerifyMismatchError
