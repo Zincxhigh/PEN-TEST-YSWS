@@ -1,5 +1,3 @@
-from server import app  
-from sqlite3.dbapi2 import SQLITE_ABORT
 from argon2 import PasswordHasher
 from argon2.exceptions import InvalidHashError, VerificationError, VerifyMismatchError
 from email_validator import EmailNotValidError, validate_email
@@ -7,10 +5,11 @@ from email_validator import EmailNotValidError, validate_email
 from flask import Flask, render_template, request, flash, redirect, url_for, session
 import os
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, UserMixin, login_user, logout_user
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required
 from flask_wtf.csrf import CSRFProtect
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 app = Flask(__name__)
@@ -20,19 +19,22 @@ if not app.config["SECRET_KEY"]:
     raise RuntimeError("Set SECRET_KEY to a random secret before starting the app.")
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 app.config["SESSION_COOKIE_SECURE"] = os.environ.get("COOKIE_SECURE") == "1"
-app.config["MAX_CONTENT_LENGTH"] = 16 * 1024
+app.config["SESSION_COOKIE_HTTPONLY"] = True
+app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///project.db")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 ph = PasswordHasher()
-dummy_hash = ph.hash(os.urandom(32))
+dummy_hash = ph.hash(os.urandom(32).hex())
 CSRFProtect(app)
 login_manager = LoginManager(app)
 limiter = Limiter(
-    get_remote_address, app=app,
+    key_func=get_remote_address,
+    app=app,
     storage_uri=os.environ.get("RATELIMIT_STORAGE_URI", "memory://")
 )
+
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -72,6 +74,7 @@ def init_db():
 def index():
     return render_template('index.html')
 
+
 @app.route('/login', methods=['GET', 'POST'])
 @limiter.limit("10 per minute", methods=["POST"])
 def login():
@@ -79,12 +82,17 @@ def login():
         sUsername = request.form.get('username', '').strip()
         sPassword = request.form.get('password', '')
         verified = False
+        user = None
         if sUsername and len(sUsername) <= 80 and sPassword and len(sPassword) <= 1024:
             user = db.session.execute(db.select(User).filter_by(username=sUsername)).scalar_one_or_none()
             try:
-                verified = ph.verify(user.password if user else dummy_hash, sPassword) and user is not None
-            except VerifyMismatchError:
-                pass
+                if user:
+                    verified = ph.verify(user.password, sPassword)
+                else:
+                    try:
+                        ph.verify(dummy_hash, sPassword)
+                    except VerifyMismatchError:
+                        pass
             except (InvalidHashError, VerificationError):
                 app.logger.exception("Invalid stored password hash")
 
@@ -98,6 +106,7 @@ def login():
             return redirect(url_for('login'))
 
     return render_template('login.html')
+
 
 @app.route("/signup", methods=['GET', 'POST'])
 @limiter.limit("5 per minute", methods=["POST"])
@@ -123,7 +132,7 @@ def signup():
             return redirect(url_for('signup'))
 
         existing = db.session.execute(db.select(User.id).where(
-            (User.username == sUsername) | (db.func.lower(User.email) == sEmail)
+            (User.username == sUsername) | (func.lower(User.email) == sEmail)
         )).first()
         if existing:
             flash("Username or email already registered.")
@@ -153,15 +162,20 @@ def signup():
 
     return render_template("signup.html")
 
+
 @app.route('/logout', methods=['POST'])
+@login_required
 def logout():
     logout_user()
     session.clear()
     return redirect(url_for('login'))
 
+
 @app.route("/dashboard")
+@login_required
 def dashboard():
     return render_template("dashboard.html")
+
 
 if __name__ == '__main__':
     with app.app_context():
