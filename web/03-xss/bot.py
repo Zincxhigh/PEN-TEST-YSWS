@@ -8,6 +8,9 @@ SECRET = os.environ.get("ADMIN_SECRET", "dev-secret")
 
 
 def main():
+    if len(sys.argv) < 2 or not sys.argv[1]:
+        print("usage: bot.py <url>", file=sys.stderr)
+        raise SystemExit(2)
     url = sys.argv[1]
     with sync_playwright() as pw:
         browser = pw.chromium.launch(args=["--no-sandbox"])
@@ -24,4 +27,5 @@ def main():
             browser.close()
 
 
-main()
+if __name__ == "__main__":
+    main()

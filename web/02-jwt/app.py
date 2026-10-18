@@ -3,12 +3,20 @@ import jwt
 from flask import Flask, request, jsonify, render_template_string
 
 app = Flask(__name__)
-SECRET = os.environ.get("JWT_SECRET", "secret123")  # TODO: use a strong secret
+SECRET = os.environ.get("JWT_SECRET", "secret123")                             
 
 USERS = {"guest": "guest", "admin": os.environ.get("ADMIN_PASSWORD", "s3cur3-r4nd0m-p4ss")}
 
-with open(os.environ.get("FLAG_FILE", "/flag.txt")) as f:
-    FLAG = f.read().strip()
+
+def _load_flag():
+    try:
+        with open(os.environ.get("FLAG_FILE", "/flag.txt")) as f:
+            return f.read().strip()
+    except OSError:
+        return "pentest{REDACTED}"
+
+
+FLAG = _load_flag()
 
 PAGE = """
 <!doctype html><html><body>

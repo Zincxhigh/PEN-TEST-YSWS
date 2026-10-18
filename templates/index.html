@@ -23,30 +23,20 @@
         <a href="/" class="nav-logo">  PEN-TEST  </a>
 
         <div class="nav-links">
-<<<<<<< HEAD
-            <a href="#about">About</a>
-            <a href="#explore">Explore</a>
-            <a href="#how-it-works">HOW IT WORKS</a>
-            <a href="#arena">Arena</a>
-=======
             <a href="#about">ABOUT</a>
             <a href="#explore">EXPLORE</a>
             <a href="#how-it-works">HOW IT WORKS</a>
->>>>>>> d94c631 (Created the Dashboard HTML and CSS.)
+            <a href="#arena">Arena</a>
             <a href="#faq">FAQ</a>
-            {% if current_user.is_authenticated %}
+            {% if current_user is defined and current_user.is_authenticated %}
             <form action="{{ url_for('logout') }}" method="post">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <button type="submit">Logout</button>
             </form>
             {% endif %}
-<<<<<<< HEAD
         </div>
 
         <a href="/play" class="nav-button">ENTER CTF →</a>
-=======
-        </div>        
->>>>>>> d94c631 (Created the Dashboard HTML and CSS.)
     </nav>
 
      <img src="{{ url_for('static', filename='images/flag-orpheus-left.svg') }}"
@@ -359,14 +349,8 @@
             <h2>READY TO<br /><span>ESCAPE?</span></h2>
 
             <a href="https://rsvp.soon.it/pen-test" class="button primary-button"> RSVP NOW → </a>
-<<<<<<< HEAD
             <a href="/play" class="button secondary-button">Enter CTF Arena</a>
-        </div>
     </section>
-=======
-      </section>
-    </main>
->>>>>>> d94c631 (Created the Dashboard HTML and CSS.)
 
     <footer>
         <strong>PEN-TEST</strong>
