@@ -14,44 +14,35 @@
         rel="stylesheet">
 
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
-       <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='logo.ico') }}">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='logo.ico') }}">
 </head>
 
 <body>
     {% include "_messages.html" %}
+
     <nav class="navbar">
-        <a href="/" class="nav-logo">  PEN-TEST  </a>
+        <a href="/" class="nav-logo">PEN-TEST</a>
 
         <div class="nav-links">
-<<<<<<< HEAD
-            <a href="#about">About</a>
-            <a href="#explore">Explore</a>
-            <a href="#how-it-works">HOW IT WORKS</a>
-            <a href="#arena">Arena</a>
-=======
             <a href="#about">ABOUT</a>
             <a href="#explore">EXPLORE</a>
             <a href="#how-it-works">HOW IT WORKS</a>
->>>>>>> d94c631 (Created the Dashboard HTML and CSS.)
+            <a href="#arena">ARENA</a>
             <a href="#faq">FAQ</a>
+
             {% if current_user.is_authenticated %}
             <form action="{{ url_for('logout') }}" method="post">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <button type="submit">Logout</button>
             </form>
             {% endif %}
-<<<<<<< HEAD
         </div>
 
         <a href="/play" class="nav-button">ENTER CTF →</a>
-=======
-        </div>        
->>>>>>> d94c631 (Created the Dashboard HTML and CSS.)
     </nav>
 
-     <img src="{{ url_for('static', filename='images/flag-orpheus-left.svg') }}"
-                alt="PEN-TEST - Escape Your Fate">
-
+    <img src="{{ url_for('static', filename='images/flag-orpheus-left.svg') }}"
+        alt="PEN-TEST - Escape Your Fate">
 
     <header class="hero">
         <div class="hero-logo">
@@ -59,7 +50,7 @@
                 alt="PEN-TEST - Escape Your Fate">
         </div>
 
-        <p class="hero-label"> CYBERSECURITY • BUILD • LEARN </p>
+        <p class="hero-label">CYBERSECURITY • BUILD • LEARN</p>
 
         <p class="hero-description">
             A youth-driven cybersecurity community where you
@@ -68,15 +59,14 @@
         </p>
 
         <div class="hero-buttons">
-            <a href="#join" class="button primary-button"> RSVP NOW → </a>
+            <a href="#join" class="button primary-button">RSVP NOW →</a>
             <a href="/play" class="button secondary-button">Enter CTF Arena</a>
         </div>
     </header>
 
-
     <section class="section about" id="about">
         <div class="section-heading">
-            <h2>LEARN BY <strong>BUILDING.</strong> </h2>
+            <h2>LEARN BY <strong>BUILDING.</strong></h2>
         </div>
 
         <div class="about-content">
@@ -93,12 +83,10 @@
         </div>
     </section>
 
-
     <section class="section" id="explore">
         <div class="section-heading">
-            <h2>WHAT WILL YOU<strong> BUILD?</strong></h2>
+            <h2>WHAT WILL YOU <strong>BUILD?</strong></h2>
         </div>
-
 
         <div class="cards">
             <article class="card">
@@ -123,7 +111,6 @@
                 </p>
             </article>
 
-
             <article class="card">
                 <div class="card-heading">
                     <span class="card-number">03</span>
@@ -135,18 +122,16 @@
                 </p>
             </article>
 
-
             <article class="card">
                 <div class="card-heading">
                     <span class="card-number">04</span>
+                    <h3>OSINT</h3>
                 </div>
-                <h3>OSINT</h3>
                 <p>
                     Learn how publicly available information
                     can be researched responsibly.
                 </p>
             </article>
-
 
             <article class="card">
                 <div class="card-heading">
@@ -158,7 +143,6 @@
                     analyzed during investigations.
                 </p>
             </article>
-
 
             <article class="card">
                 <div class="card-heading">
@@ -172,7 +156,6 @@
             </article>
         </div>
     </section>
-
 
     <section class="section tools-section">
         <div class="section-heading">
@@ -191,23 +174,20 @@
             <div class="tool">+</div>
         </div>
 
-
         <p class="tool-note">
             Tools are explored for ethical learning,
             defensive research, and authorized testing.
         </p>
     </section>
 
-
     <section class="section" id="how-it-works">
         <div class="section-heading">
-            <h2>HOW IT <strong>WORKS.</strong> </h2>
+            <h2>HOW IT <strong>WORKS.</strong></h2>
         </div>
-
 
         <div class="steps">
             <div class="step">
-                <div class="step-number"> 01 </div>
+                <div class="step-number">01</div>
                 <div>
                     <h3>Build a project</h3>
                     <p>
@@ -217,9 +197,8 @@
                 </div>
             </div>
 
-
             <div class="step">
-                <div class="step-number"> 02 </div>
+                <div class="step-number">02</div>
                 <div>
                     <h3>Track your progress</h3>
                     <p>
@@ -228,7 +207,6 @@
                     </p>
                 </div>
             </div>
-
 
             <div class="step">
                 <div class="step-number">03</div>
@@ -240,7 +218,6 @@
                     </p>
                 </div>
             </div>
-
 
             <div class="step">
                 <div class="step-number">04</div>
@@ -255,7 +232,6 @@
         </div>
     </section>
 
-
     <section class="section" id="arena">
         <div class="section-heading">
             <h2>Enter the <strong>arena.</strong></h2>
@@ -267,16 +243,34 @@
                 <div class="step-number">⚑</div>
                 <div>
                     <h3>Play challenges</h3>
-                    <p>Web, crypto, forensics, OSINT and more — solve and capture flags.</p>
-                    <p><a href="{{ ctfd_url }}/challenges" target="_blank" rel="noopener" style="color:#ff3030;">{{ ctfd_url }}/challenges →</a></p>
+                    <p>
+                        Web, crypto, forensics, OSINT and more —
+                        solve challenges and capture flags.
+                    </p>
+                    <p>
+                        <a href="{{ ctfd_url }}/challenges"
+                            target="_blank"
+                            rel="noopener"
+                            style="color:#ff3030;">
+                            {{ ctfd_url }}/challenges →
+                        </a>
+                    </p>
                 </div>
             </div>
+
             <div class="step">
                 <div class="step-number">≡</div>
                 <div>
                     <h3>Climb the scoreboard</h3>
-                    <p>Watch rankings update live as players solve.</p>
-                    <p><a href="{{ ctfd_url }}/scoreboard" target="_blank" rel="noopener" style="color:#ff3030;">{{ ctfd_url }}/scoreboard →</a></p>
+                    <p>Watch rankings update live as players solve challenges.</p>
+                    <p>
+                        <a href="{{ ctfd_url }}/scoreboard"
+                            target="_blank"
+                            rel="noopener"
+                            style="color:#ff3030;">
+                            {{ ctfd_url }}/scoreboard →
+                        </a>
+                    </p>
                 </div>
             </div>
         </div>
@@ -285,107 +279,141 @@
             <a href="/play" class="button primary-button">Enter CTF Arena →</a>
             <a href="/register" class="button secondary-button">Register with Hack Club</a>
         </div>
+
         <p class="tool-note" id="ctfd-status">Checking arena status…</p>
     </section>
-
 
     <section class="faq-section" id="faq">
         <div class="section-heading">
             <h2>FAQ</h2>
-            <p> Everything you need to know before jumping into PEN-TEST. </p>
+            <p>Everything you need to know before jumping into PEN-TEST.</p>
         </div>
 
         <div class="faq-container">
             <details class="faq-item">
                 <summary>What tools can I use?</summary>
                 <div class="faq-answer">
-                    <p>Wireshark, Nmap, Burp Suite, Metasploit, Hashcat, Volatility, Autopsy, BeEF anything you like as long as it's for a project and not a for malicous use </p>
+                    <p>
+                        Wireshark, Nmap, Burp Suite, Metasploit, Hashcat,
+                        Volatility, Autopsy, BeEF — use tools for authorized
+                        projects and ethical learning, never malicious activity.
+                    </p>
                 </div>
             </details>
 
             <details class="faq-item">
                 <summary>How many submissions can I make?</summary>
                 <div class="faq-answer">
-                    <p> As many as you want! </p>
+                    <p>As many as you want!</p>
                 </div>
             </details>
 
             <details class="faq-item">
                 <summary>Can I use AI?</summary>
                 <div class="faq-answer">
-                    <p> AI is not allowed. We want to see your work not AI.</p>
+                    <p>AI is not allowed. We want to see your own work.</p>
                 </div>
             </details>
 
             <details class="faq-item">
                 <summary>Can I participate?</summary>
                 <div class="faq-answer">
-                    <p> Any teenager ages 13–18 (under 19) can join! </p>
+                    <p>Any teenager aged 13–18 (under 19) can join!</p>
                 </div>
             </details>
 
             <details class="faq-item">
                 <summary>Can I join even if I can't code?</summary>
                 <div class="faq-answer">
-                    <p> Beginners are more than welcome to participate in PEN-TEST. </p>
+                    <p>Beginners are more than welcome to participate in PEN-TEST.</p>
                 </div>
             </details>
 
             <details class="faq-item">
                 <summary>Can I submit my project to another YSWS?</summary>
                 <div class="faq-answer">
-                    <p> Double-dipping isn't allowed, sorry! </p>
+                    <p>Double-dipping isn't allowed, sorry!</p>
                 </div>
             </details>
 
             <details class="faq-item">
                 <summary>How do I register for the CTF?</summary>
                 <div class="faq-answer">
-                    <p> Hit <a href="/register">Register with Hack Club</a> — we use your Hack Club identity to create your CTF account and log you straight into the arena. </p>
+                    <p>
+                        Hit <a href="/register">Register with Hack Club</a>.
+                        We use your Hack Club identity to create your CTF
+                        account and log you into the arena.
+                    </p>
                 </div>
             </details>
 
             <details class="faq-item">
                 <summary>Can I submit team projects?</summary>
                 <div class="faq-answer">
-                    <p> No, sorry! </p>
+                    <p>No, sorry!</p>
                 </div>
             </details>
         </div>
     </section>
 
-
     <section class="final">
-            <h2>READY TO<br /><span>ESCAPE?</span></h2>
+        <h2>READY TO<br /><span>ESCAPE?</span></h2>
 
-            <a href="https://rsvp.soon.it/pen-test" class="button primary-button"> RSVP NOW → </a>
-<<<<<<< HEAD
-            <a href="/play" class="button secondary-button">Enter CTF Arena</a>
-        </div>
+        <a href="https://rsvp.soon.it/pen-test"
+            class="button primary-button">
+            RSVP NOW →
+        </a>
+
+        <a href="/play" class="button secondary-button">
+            Enter CTF Arena
+        </a>
     </section>
-=======
-      </section>
-    </main>
->>>>>>> d94c631 (Created the Dashboard HTML and CSS.)
 
     <footer>
         <strong>PEN-TEST</strong>
-        <p>Made with ♡ by teens for teens · <a href="{{ ctfd_url }}" target="_blank" rel="noopener" style="color:#ff3030;">CTF Arena</a> · <span id="ctfd-footer-status">…</span></p>
+        <p>
+            Made with ♡ by teens for teens ·
+            <a href="{{ ctfd_url }}"
+                target="_blank"
+                rel="noopener"
+                style="color:#ff3030;">
+                CTF Arena
+            </a>
+            · <span id="ctfd-footer-status">…</span>
+        </p>
     </footer>
 
     <script>
         fetch("/api/ctfd/status")
-            .then(r => r.json().then(b => ({ ok: r.ok, body: b })))
+            .then(response =>
+                response.json().then(body => ({
+                    ok: response.ok,
+                    body: body
+                }))
+            )
             .then(({ ok, body }) => {
-                const msg = ok ? "● arena online" : "○ arena offline";
-                const el1 = document.getElementById("ctfd-status");
-                const el2 = document.getElementById("ctfd-footer-status");
-                if (el1) el1.textContent = msg + " — " + body.ctfd_url;
-                if (el2) { el2.textContent = msg; el2.style.color = ok ? "#3dff7a" : "#ff3030"; }
+                const message = ok ? "● arena online" : "○ arena offline";
+
+                const statusElement = document.getElementById("ctfd-status");
+                const footerElement = document.getElementById("ctfd-footer-status");
+
+                if (statusElement) {
+                    statusElement.textContent =
+                        message + " — " + body.ctfd_url;
+                }
+
+                if (footerElement) {
+                    footerElement.textContent = message;
+                    footerElement.style.color =
+                        ok ? "#3dff7a" : "#ff3030";
+                }
             })
             .catch(() => {
-                const el1 = document.getElementById("ctfd-status");
-                if (el1) el1.textContent = "○ arena status unknown";
+                const statusElement = document.getElementById("ctfd-status");
+
+                if (statusElement) {
+                    statusElement.textContent = "○ arena status unknown";
+                }
             });
     </script>
 </body>
