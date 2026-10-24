@@ -1,0 +1,412 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PEN-TEST | Orders</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/admin-orders.css') }}">
+</head>
+<body>
+  <nav class="navbar">
+    <a class="brand" href="/">PEN-TEST</a>
+    <div class="nav-right">
+      <span class="admin-label">ADMIN</span>
+      <a class="back-link" href="{{ url_for('shop') }}">Back to shop ↗</a>
+    </div>
+  </nav>
+
+  <main class="container">
+    <header class="page-heading">
+      <div>
+        <h1>Orders</h1>
+      </div>
+      <button class="button button-secondary" id="refreshOrders" type="button">
+        ↻ Refresh
+      </button>
+    </header>
+
+    <section class="stats" aria-label="Order statistics">
+      <article class="stat-card">
+        <span class="stat-label">Total orders</span>
+        <strong id="totalOrders">—</strong>
+        <span class="stat-note">All orders</span>
+      </article>
+      <article class="stat-card">
+        <span class="stat-label">Pending</span>
+        <strong id="pendingOrders">—</strong>
+        <span class="stat-note">Awaiting processing</span>
+      </article>
+      <article class="stat-card">
+        <span class="stat-label">Shipped</span>
+        <strong id="shippedOrders">—</strong>
+        <span class="stat-note">On the way</span>
+      </article>
+      <article class="stat-card">
+        <span class="stat-label">Delivered</span>
+        <strong id="deliveredOrders">—</strong>
+        <span class="stat-note">Completed orders</span>
+      </article>
+    </section>
+
+    <section class="orders-panel">
+      <div class="panel-heading">
+        <div>
+          <h2>All orders</h2>
+          <p id="orderCount">Loading orders...</p>
+        </div>
+
+        <div class="filters">
+          <label class="search-box">
+            <span aria-hidden="true">⌕</span>
+            <input id="searchOrders" type="search"
+                   placeholder="Search orders..." aria-label="Search orders">
+          </label>
+
+          <select id="statusFilter" aria-label="Filter orders by status">
+            <option value="all">All statuses</option>
+            <option value="pending">Pending</option>
+            <option value="processing">Processing</option>
+            <option value="shipped">Shipped</option>
+            <option value="delivered">Delivered</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+      </div>
+
+      <p id="message" class="message" role="status" aria-live="polite"></p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Order</th>
+              <th>Customer</th>
+              <th>Product</th>
+              <th>Qty</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th>Update status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="ordersTable">
+            <tr><td class="table-message" colspan="8">Loading orders...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="details-panel" id="detailsPanel" hidden>
+      <div class="details-heading">
+        <div>
+          <p class="eyebrow">ORDER INFORMATION</p>
+          <h2 id="detailsTitle">Order details</h2>
+        </div>
+        <button class="button button-secondary" id="closeDetails" type="button">
+          Close
+        </button>
+      </div>
+      <dl class="details-grid" id="detailsContent"></dl>
+    </section>
+  </main>
+
+  <footer>PEN-TEST <span>/</span> Admin console</footer>
+
+  <script>
+    /*
+      BACKEND API CONTRACT
+
+      GET   /api/admin/orders
+      Response: { "orders": [...] }
+
+      PATCH /api/admin/orders/<id>/status
+      Request:  { "status": "processing" }
+      Response: { "order": {...} } or { "success": true }
+
+      Each order:
+      id, customer_name, product_name, quantity, total_flags,
+      status, shipping_address, city, postal_code, created_at
+
+      Backend must authorize every endpoint and validate status changes.
+      Add the CSRF header/token required by the Flask application.
+    */
+
+    const API_URL = "/api/admin/orders";
+    const ALLOWED_STATUSES = [
+      "pending", "processing", "shipped", "delivered", "cancelled"
+    ];
+
+    const $ = id => document.getElementById(id);
+    let orders = [];
+
+    function showMessage(message = "", type = "") {
+      $("message").textContent = message;
+      $("message").className = `message ${type}`.trim();
+    }
+
+    function formatFlags(value) {
+      const number = Number(value);
+      return Number.isFinite(number) ? `${number} flags` : "—";
+    }
+
+    function formatDate(value) {
+      if (!value) return "Not provided";
+      const date = new Date(value);
+      return Number.isNaN(date.getTime())
+        ? String(value)
+        : date.toLocaleString();
+    }
+
+    function updateStats() {
+      $("totalOrders").textContent = orders.length;
+      $("pendingOrders").textContent =
+        orders.filter(order => order.status === "pending").length;
+      $("shippedOrders").textContent =
+        orders.filter(order => order.status === "shipped").length;
+      $("deliveredOrders").textContent =
+        orders.filter(order => order.status === "delivered").length;
+    }
+
+    function addCell(row, value) {
+      const cell = row.insertCell();
+      cell.textContent = value ?? "—";
+      return cell;
+    }
+
+    function renderOrders() {
+      const query = $("searchOrders").value.trim().toLowerCase();
+      const statusFilter = $("statusFilter").value;
+      const tbody = $("ordersTable");
+
+      const filtered = orders.filter(order => {
+        const searchable = [
+          order.id,
+          order.customer_name,
+          order.product_name
+        ].join(" ").toLowerCase();
+
+        return searchable.includes(query) &&
+          (statusFilter === "all" || order.status === statusFilter);
+      });
+
+      tbody.replaceChildren();
+      $("orderCount").textContent =
+        `${filtered.length} ${filtered.length === 1 ? "order" : "orders"}`;
+
+      if (!filtered.length) {
+        const row = tbody.insertRow();
+        const cell = row.insertCell();
+        cell.colSpan = 8;
+        cell.className = "table-message";
+        cell.textContent = orders.length
+          ? "No orders match your search."
+          : "No orders yet.";
+        return;
+      }
+
+      filtered.forEach(order => {
+        const row = tbody.insertRow();
+
+        const idCell = addCell(row, `#${order.id}`);
+        idCell.className = "order-id";
+
+        addCell(row, order.customer_name);
+        addCell(row, order.product_name);
+        addCell(row, order.quantity);
+        addCell(row, formatFlags(order.total_flags));
+
+        const statusCell = row.insertCell();
+        const badge = document.createElement("span");
+        const validStatus = ALLOWED_STATUSES.includes(order.status);
+        badge.className = `status-badge ${validStatus ? order.status : ""}`;
+        badge.textContent = validStatus
+          ? order.status.charAt(0).toUpperCase() + order.status.slice(1)
+          : "Unknown";
+        statusCell.appendChild(badge);
+
+        const updateCell = row.insertCell();
+        updateCell.className = "update-cell";
+
+        const select = document.createElement("select");
+        select.setAttribute("aria-label", `Status for order ${order.id}`);
+
+        ALLOWED_STATUSES.forEach(status => {
+          const option = document.createElement("option");
+          option.value = status;
+          option.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+          option.selected = status === order.status;
+          select.appendChild(option);
+        });
+
+        const saveButton = document.createElement("button");
+        saveButton.type = "button";
+        saveButton.className = "button button-small button-primary";
+        saveButton.textContent = "Save";
+        saveButton.disabled = !validStatus;
+
+        saveButton.addEventListener("click", () => {
+          if (select.value === order.status) {
+            showMessage("Choose a different status first.", "error");
+            return;
+          }
+          updateStatus(order.id, select.value, saveButton);
+        });
+
+        updateCell.append(select, saveButton);
+
+        const detailsCell = row.insertCell();
+        const detailsButton = document.createElement("button");
+        detailsButton.type = "button";
+        detailsButton.className = "details-link";
+        detailsButton.textContent = "View →";
+        detailsButton.addEventListener("click", () => showDetails(order));
+        detailsCell.appendChild(detailsButton);
+      });
+    }
+
+    async function loadOrders() {
+      const refreshButton = $("refreshOrders");
+      refreshButton.disabled = true;
+      showMessage("Loading orders...");
+
+      const tbody = $("ordersTable");
+      tbody.replaceChildren();
+      const loadingRow = tbody.insertRow();
+      const loadingCell = loadingRow.insertCell();
+      loadingCell.colSpan = 8;
+      loadingCell.className = "table-message";
+      loadingCell.textContent = "Loading orders...";
+
+      try {
+        const response = await fetch(API_URL, {
+          method: "GET",
+          credentials: "same-origin",
+          headers: { "Accept": "application/json" }
+        });
+
+        if (response.status === 401 || response.status === 403) {
+          throw new Error("You don't have permission to view these orders.");
+        }
+        if (!response.ok) throw new Error("Could not load orders.");
+
+        const data = await response.json();
+        if (!Array.isArray(data.orders)) {
+          throw new Error("Invalid response: expected an orders array.");
+        }
+
+        orders = data.orders;
+        updateStats();
+        renderOrders();
+        showMessage("Orders loaded.", "success");
+      } catch (error) {
+        orders = [];
+        updateStats();
+        tbody.replaceChildren();
+        const row = tbody.insertRow();
+        const cell = row.insertCell();
+        cell.colSpan = 8;
+        cell.className = "table-message";
+        cell.textContent = error.message || "Something went wrong.";
+        $("orderCount").textContent = "Orders unavailable";
+        showMessage(error.message || "Something went wrong.", "error");
+      } finally {
+        refreshButton.disabled = false;
+      }
+    }
+
+    async function updateStatus(orderId, status, button) {
+      if (!ALLOWED_STATUSES.includes(status)) {
+        showMessage("Invalid status selected.", "error");
+        return;
+      }
+
+      button.disabled = true;
+      button.textContent = "Saving...";
+
+      try {
+        const response = await fetch(
+          `${API_URL}/${encodeURIComponent(orderId)}/status`,
+          {
+            method: "PATCH",
+            credentials: "same-origin",
+            headers: {
+              "Content-Type": "application/json",
+              "Accept": "application/json"
+              // Add the Flask app's required CSRF header here.
+            },
+            body: JSON.stringify({ status })
+          }
+        );
+
+        const result = await response.json().catch(() => ({}));
+
+        if (response.status === 401 || response.status === 403) {
+          throw new Error("You don't have permission to update orders.");
+        }
+        if (!response.ok) {
+          throw new Error(result.error || "Status update failed.");
+        }
+
+        showMessage("Order status updated.", "success");
+        await loadOrders();
+      } catch (error) {
+        showMessage(error.message || "Status update failed.", "error");
+      } finally {
+        button.disabled = false;
+        button.textContent = "Save";
+      }
+    }
+
+    function showDetails(order) {
+      $("detailsTitle").textContent = `Order #${order.id}`;
+
+      const fields = [
+        ["Customer", order.customer_name],
+        ["Product", order.product_name],
+        ["Quantity", order.quantity],
+        ["Total", formatFlags(order.total_flags)],
+        ["Status", order.status],
+        ["Delivery address", order.shipping_address],
+        ["City", order.city],
+        ["Postal code", order.postal_code],
+        ["Order date", formatDate(order.created_at)]
+      ];
+
+      const content = $("detailsContent");
+      content.replaceChildren();
+
+      fields.forEach(([label, value]) => {
+        const group = document.createElement("div");
+        group.className = "detail-item";
+
+        const term = document.createElement("dt");
+        term.textContent = label;
+
+        const description = document.createElement("dd");
+        description.textContent = value ?? "Not provided";
+
+        group.append(term, description);
+        content.appendChild(group);
+      });
+
+      $("detailsPanel").hidden = false;
+      $("detailsPanel").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    $("searchOrders").addEventListener("input", renderOrders);
+    $("statusFilter").addEventListener("change", renderOrders);
+    $("refreshOrders").addEventListener("click", loadOrders);
+    $("closeDetails").addEventListener("click", () => {
+      $("detailsPanel").hidden = true;
+    });
+
+    loadOrders();
+  </script>
+</body>
+</html>

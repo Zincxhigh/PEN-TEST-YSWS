@@ -172,20 +172,26 @@ def logout():
 
 
 @app.route("/dashboard")
-@login_required
+# @login_required
 def dashboard():
     return render_template("dashboard.html")
 
 @app.route("/community")
-@login_required
+# @login_required
 def community():
     return render_template("community.html")
 
 
 @app.route("/shop")
-@login_required
+# @login_required
 def shop():
     return render_template("shop.html")
+
+
+@app.route("/admin-orders")
+# @login_required
+def admin_orders():
+    return render_template("admin-orders.html")
 
 
 if __name__ == '__main__':
