@@ -34,13 +34,10 @@ def _load_dotenv(path):
 _load_dotenv(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env"))
 
 app = Flask(__name__)
-# Own cookie name: the CTFd handoff sets a cookie literally named "session",
-# so ours must not collide with it (last same-name Set-Cookie wins).
 app.config["SESSION_COOKIE_NAME"] = "pentest_session"
 SECRET_KEY_DEFAULTED = not os.environ.get("SECRET_KEY", "")
 app.secret_key = os.environ.get("SECRET_KEY", "") or secrets.token_hex(32)
 if SECRET_KEY_DEFAULTED:
-    # A random key breaks logins across restarts and across gunicorn workers.
     app.logger.warning("SECRET_KEY is not set: login sessions break across "
                        "restarts/workers. Set a stable SECRET_KEY in .env.")
 
@@ -49,31 +46,23 @@ CTFD_PORT = os.environ.get("CTFD_PORT", "8000").strip() or "8000"
 CTFD_SCHEME = os.environ.get("CTFD_SCHEME", "http").strip() or "http"
 CTFD_INTERNAL_URL = os.environ.get("CTFD_INTERNAL_URL", "http://ctfd:8000").strip().rstrip("/") or "http://ctfd:8000"
 
-# Hack Club Auth (https://auth.hackclub.com/docs). Create an OAuth app to get
-# these, and register {APP_BASE_URL}/auth/hackclub/callback as redirect URI.
 HACKCLUB_CLIENT_ID = os.environ.get("HACKCLUB_CLIENT_ID", "").strip()
 HACKCLUB_CLIENT_SECRET = os.environ.get("HACKCLUB_CLIENT_SECRET", "").strip()
 HACKCLUB_AUTHORIZE_URL = "https://auth.hackclub.com/oauth/authorize"
 HACKCLUB_TOKEN_URL = "https://auth.hackclub.com/oauth/token"
 HACKCLUB_ME_URL = "https://auth.hackclub.com/api/v1/me"
 APP_BASE_URL = os.environ.get("APP_BASE_URL", "http://localhost:5000").strip().rstrip("/") or "http://localhost:5000"
-# Admin API token from the CTFd admin panel, used to provision CTF accounts.
 CTFD_API_TOKEN = os.environ.get("CTFD_API_TOKEN", "").strip()
-# Initial arena password. Empty = random one-time password shown once instead.
 ARENA_DEFAULT_PASSWORD = os.environ.get("ARENA_DEFAULT_PASSWORD", "").strip()
 
 
 def get_ctfd_url():
-    """Public CTFd URL for this request (same server by default)."""
     if CTFD_URL_OVERRIDE:
         return CTFD_URL_OVERRIDE
-    # Prefer an explicit APP_BASE_URL when configured to avoid using Host header.
-    if APP_BASE_URL:
-        return APP_BASE_URL
     try:
         hostname = request.host.split(":")[0] or "localhost"
         scheme = os.environ.get("CTFD_SCHEME", "").strip() or request.scheme
-    except RuntimeError:  
+    except RuntimeError:
         hostname, scheme = "localhost", CTFD_SCHEME
     return f"{scheme}://{hostname}:{CTFD_PORT}"
 
@@ -109,11 +98,6 @@ def ctfd_deep_link():
     return redirect(ctfd_url(request.path), code=302)
 
 
-# --- Hack Club Auth -> CTFd registration ------------------------------------
-# /register sends the player to Hack Club; the callback verifies their identity,
-# creates their CTFd account via the admin API, logs it in, and hands the CTFd
-# session cookie to the browser. Cookie handoff works when site + CTFd share a
-# host (cookies ignore ports); otherwise we fall back to CTFd's own /login page.
 def hackclub_configured():
     return bool(HACKCLUB_CLIENT_ID and HACKCLUB_CLIENT_SECRET)
 
@@ -149,7 +133,7 @@ def hc_name(identity):
 
 def ctfd_username_for(identity):
     base = hc_name(identity)
-    if "@" in base and " " not in base:  # looks like an email, use the local part
+    if "@" in base and " " not in base:                                           
         base = base.split("@")[0]
     email = hc_email(identity)
     if not base and email:
@@ -211,7 +195,7 @@ def _api_bases():
     bases = [CTFD_INTERNAL_URL]
     try:
         public = get_ctfd_url().rstrip("/")
-    except RuntimeError:  # noqa: BLE001 - no request context
+    except RuntimeError:                                     
         public = ""
     if public and public not in bases:
         bases.append(public)
@@ -219,23 +203,22 @@ def _api_bases():
 
 
 def ctfd_create_user(username, email, password, verified):
-    """Create a CTFd account. Returns (status, errors) with status one of
-    'created', 'taken' (username clash only -> try a suffix), 'exists'
-    (email taken -> account already registered), 'error'."""
+    if requests is None:
+        return "error", {"connection": "requests not installed"}
     payload = {"name": username, "email": email, "password": password, "type": "user",
                "verified": verified, "hidden": False, "banned": False, "fields": []}
     headers = {"Authorization": f"Token {CTFD_API_TOKEN}", "Content-Type": "application/json"}
     for base in _api_bases():
         try:
             r = requests.post(f"{base}/api/v1/users", headers=headers, json=payload, timeout=10)
-        except Exception as e:  # noqa: BLE001 - base unreachable, try next
+        except Exception as e:
             app.logger.info("ctfd api create: %s unreachable (%s)", base, type(e).__name__)
             continue
         if r.status_code < 300:
             return "created", {}
         try:
             errors = r.json().get("errors", {}) or {}
-        except Exception:  # noqa: BLE001 - non-JSON error body
+        except Exception:
             errors = {}
         app.logger.info("ctfd api create: %s status=%s errors=%s", base, r.status_code, sorted(errors))
         if r.status_code == 400 and "name" in errors and "email" not in errors:
@@ -250,7 +233,8 @@ _NONCE_RE = re.compile(r"""name=["']nonce["']\s+value=["']([^"']+)["']|value=["'
 
 
 def ctfd_login_cookies(username, password):
-    """Log fresh credentials into CTFd, return its session cookies (or {})."""
+    if requests is None:
+        return {}
     for base in _api_bases():
         s = requests.Session()
         try:
@@ -264,8 +248,7 @@ def ctfd_login_cookies(username, password):
                          or r.url.rstrip("/").endswith("/challenges"))
             if logged_in and s.cookies.get("session"):
                 return {"session": s.cookies.get("session")}
-            return {}
-        except Exception:  # noqa: BLE001 - base unreachable, try next
+        except Exception:
             app.logger.info("ctfd login: %s unreachable", base)
             continue
     return {}
@@ -279,12 +262,13 @@ def id_token_claims(id_token):
         payload += "=" * (-len(payload) % 4)
         data = json.loads(base64.urlsafe_b64decode(payload).decode("utf-8"))
         return data if isinstance(data, dict) else {}
-    except Exception:  # noqa: BLE001 - malformed token, fall back to /me
+    except Exception:                                                    
         return {}
 
 
 def ctfd_find_user(email):
-    """Find a CTFd user by email. Returns the user dict or None."""
+    if requests is None:
+        return None
     headers = {"Authorization": f"Token {CTFD_API_TOKEN}"}
     for base in _api_bases():
         try:
@@ -301,15 +285,15 @@ def ctfd_find_user(email):
                 pagination = (body.get("meta") or {}).get("pagination") or {}
                 if pagination.get("page", page) >= pagination.get("pages", page):
                     break
-        except Exception:  # noqa: BLE001 - base unreachable, try next
+        except Exception:
             app.logger.info("ctfd api find: %s unreachable", base)
             continue
-    # not found on any base
     return None
 
 
 def ctfd_set_password(user_id, password):
-    """Reset a CTFd user's password via the admin API."""
+    if requests is None:
+        return False
     headers = {"Authorization": f"Token {CTFD_API_TOKEN}", "Content-Type": "application/json"}
     for base in _api_bases():
         try:
@@ -317,7 +301,7 @@ def ctfd_set_password(user_id, password):
                                json={"password": password}, timeout=10)
             app.logger.info("ctfd api patch: %s status=%s", base, r.status_code)
             return r.status_code < 300
-        except Exception:  # noqa: BLE001 - base unreachable, try next
+        except Exception:
             app.logger.info("ctfd api patch: %s unreachable", base)
             continue
     return False
@@ -377,7 +361,6 @@ def hackclub_callback():
         return auth_error(f"Hack Club said: "
                           f"{request.args.get('error_description') or request.args.get('error')}", 400)
     state, expected = request.args.get("state", ""), session.pop("hackclub_oauth_state", "")
-    # Log booleans only, never secret values.
     app.logger.info("hackclub callback: session_cookie=%s state_param=%s state_match=%s",
                     app.config["SESSION_COOKIE_NAME"] in request.cookies,
                     bool(state), bool(state and state == expected))
@@ -398,7 +381,7 @@ def hackclub_callback():
         access = tok_body.get("access_token", "")
         id_token = tok_body.get("id_token", "")
         granted_scope = tok_body.get("scope", "")
-    except Exception:  # noqa: BLE001 - token endpoint unreachable
+    except Exception:                                             
         access, id_token, granted_scope = "", "", ""
     app.logger.info("hackclub token exchange status=%s granted_scope=%s",
                     tok.status_code if "tok" in locals() else "exception", granted_scope)
@@ -409,7 +392,7 @@ def hackclub_callback():
         identity = me.json() if me.status_code < 300 else {}
         app.logger.info("hackclub /me status=%s keys=%s shape=%s",
                         me.status_code, hc_keys(identity), hc_shape(identity))
-    except Exception:  # noqa: BLE001 - identity endpoint unreachable
+    except Exception:                                                
         identity = {}
         app.logger.info("hackclub /me request failed")
     email = hc_email(identity)
@@ -419,8 +402,6 @@ def hackclub_callback():
                           " Check that the 'email' scope is enabled for your OAuth app, then revoke "
                           "the app's access in your Hack Club account and try again so it re-asks.", 502)
     if isinstance(identity, dict):
-        # /me only carries id + primary_email, so take the name from the
-        # OIDC ID token (same trusted token response) when /me has none.
         claims = id_token_claims(id_token)
         if claims and not hc_name(identity):
             for key in ("name", "preferred_username", "username"):
@@ -447,8 +428,6 @@ def hackclub_callback():
             final_name, outcome = candidate, "created"
             break
         if last_status == "exists":
-            # Returning player: reset password to the default so the shown
-            # credentials always work, then log them in.
             user = ctfd_find_user(email)
             if user and user.get("id") and ctfd_set_password(user["id"], password):
                 final_name, outcome = user.get("name") or candidate, "reset"

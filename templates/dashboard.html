@@ -31,7 +31,8 @@
         <a href="{{ url_for('community') }}">COMMUNITY</a>
         <a href="{{ url_for('shop') }}">SHOP</a>
       </div>
-      <form action="" method="post">
+      <form action="{{ url_for('logout') }}" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <button class="logout" type="submit">LOGOUT</button>
       </form>
     </nav>

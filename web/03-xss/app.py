@@ -1,13 +1,23 @@
 import os
 import subprocess
+import sys
 import urllib.parse
 from flask import Flask, request, redirect, render_template_string
 
 app = Flask(__name__)
 SECRET = os.environ.get("ADMIN_SECRET", "dev-secret")
 APP_URL = os.environ.get("APP_URL", "http://127.0.0.1:5000")
-with open(os.environ.get("FLAG_FILE", "/flag.txt")) as f:
-    FLAG = f.read().strip()
+
+
+def _load_flag():
+    try:
+        with open(os.environ.get("FLAG_FILE", "/flag.txt")) as f:
+            return f.read().strip()
+    except OSError:
+        return "pentest{REDACTED}"
+
+
+FLAG = _load_flag()
 
 NOTES = []
 PAGE = """
@@ -66,7 +76,7 @@ def report():
         return "the admin only visits this site", 400
     try:
         r = subprocess.run(
-            ["python", "bot.py", url], capture_output=True, timeout=25
+            [sys.executable, os.path.join(os.path.dirname(os.path.abspath(__file__)), "bot.py"), url], capture_output=True, timeout=25
         )
         if r.returncode != 0:
             return "bot error: %s" % (r.stderr.decode()[-200:]), 500

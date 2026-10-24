@@ -29,11 +29,17 @@ ph = PasswordHasher()
 dummy_hash = ph.hash(os.urandom(32).hex())
 CSRFProtect(app)
 login_manager = LoginManager(app)
+login_manager.login_view = "login"
 limiter = Limiter(
     key_func=get_remote_address,
     app=app,
     storage_uri=os.environ.get("RATELIMIT_STORAGE_URI", "memory://")
 )
+
+
+@app.context_processor
+def inject_ctfd():
+    return {"ctfd_url": os.environ.get("CTFD_URL", "").strip().rstrip("/")}
 
 
 class User(db.Model, UserMixin):

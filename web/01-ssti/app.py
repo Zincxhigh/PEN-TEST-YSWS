@@ -1,8 +1,8 @@
+import os
+
 from flask import Flask, request, render_template_string
 
 app = Flask(__name__)
-
-# NOTE: light denylist on purpose — think about *other* ways to spell things.
 BLOCKED = ["__", "os", "popen", "system", "import", "config", "request"]
 
 PAGE = """
@@ -27,10 +27,8 @@ def index():
             if bad in name:
                 return "blocked! (%s)" % bad, 403
         card = render_template_string(CARD % name)
-    from flask import render_template_string as r
-    return r(PAGE, card=card)
+    return render_template_string(PAGE, card=card)
 
 
 if __name__ == "__main__":
-    import os
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", "5000")))
