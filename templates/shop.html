@@ -236,7 +236,7 @@
     <script>
       /*
     BACKEND API CONTRACT
-    --------------------
+
     GET  /api/shop/products
          Expected: { "products": [{ "id": 1, "name": "...",
            "price": 8, "stock": 30, "description": "..." }] }
@@ -370,10 +370,8 @@
 
         $("detailsDescription").textContent = product.description;
 
-        $("stockNote").textContent =
-          product.stock > 0
-            ? `${product.stock} ITEMS IN STOCK`
-            : "OUT OF STOCK";
+        $("stockNote").hidden = true;
+        $("stockNote").textContent = "";
 
         $("quantity").value = 1;
 
@@ -587,9 +585,8 @@
 
           balance = result.balance;
           orders.unshift(result.order);
-
-          $("stockNote").textContent =
-            `${selectedProduct.stock} ITEMS IN STOCK`;
+          $("stockNote").hidden = true;
+          $("stockNote").textContent = "";
 
           renderProducts();
           renderOrders();
