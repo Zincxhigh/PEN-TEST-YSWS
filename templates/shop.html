@@ -1,0 +1,646 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PEN-TEST | Shop</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles/shop.css') }}"
+    />
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="{{ url_for('static', filename='logo.ico') }}"
+    />
+  </head>
+  <body>
+    {% include "_messages.html" %}
+    <nav class="navbar">
+      <a href="/" class="nav-logo">PEN-TEST</a>
+      <div class="nav-links">
+        <a href="#projects">PROJECTS</a>
+        <a href="{{ url_for('community') }}">COMMUNITY</a>
+        <a href="{{ url_for('shop') }}">SHOP</a>
+      </div>
+
+      <form action="" method="post">
+        <button class="logout" type="submit">LOGOUT</button>
+      </form>
+    </nav>
+
+    <main>
+      <section class="shop-section section" id="shop">
+        <div class="section-heading">
+          <div>
+            <h2>UNLOCK <span>STUFF.</span></h2>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <label class="search" for="productSearch">
+            <span class="search-icon">⌕</span>
+            <input
+              id="productSearch"
+              type="search"
+              placeholder="SEARCH..."
+              autocomplete="off"
+            />
+          </label>
+
+          <select id="productSort" aria-label="Sort products">
+            <option value="featured">FEATURED</option>
+            <option value="low">LOWEST PRICES</option>
+            <option value="high">HIGHEST PRICES</option>
+          </select>
+        </div>
+
+        <div class="product-grid" id="productGrid">
+          <article class="product-card" data-id="1">
+            <button class="product-open" type="button" data-open="1">
+              <img src="" alt="PEN-TEST STICKERS" class="product-image" />
+              <div class="product-content">
+                <h3>PEN-TEST STICKERS</h3>
+                <p class="product-description">Cool Stickers!!</p>
+                <div class="product-footer">
+                  <span class="flag-price">08 FLAGS ⚑</span>
+                  <span class="view-label">VIEW →</span>
+                </div>
+              </div>
+            </button>
+          </article>
+
+          <article class="product-card" data-id="2">
+            <button class="product-open" type="button" data-open="2">
+              <img src="" alt="THE CYBER PACK" class="product-image" />
+              <div class="product-content">
+                <h3>THE CYBER PACK</h3>
+                <p class="product-description">A pack full of cybers</p>
+                <div class="product-footer">
+                  <span class="flag-price">15 FLAGS ⚑</span>
+                  <span class="view-label">VIEW →</span>
+                </div>
+              </div>
+            </button>
+          </article>
+
+          <article class="product-card" data-id="3">
+            <button class="product-open" type="button" data-open="3">
+              <img src="" alt="BUILDER KIT" class="product-image" />
+              <div class="product-content">
+                <h3>BUILDER KIT</h3>
+                <p class="product-description">A kit for Builders :D</p>
+                <div class="product-footer">
+                  <span class="flag-price">25 FLAGS ⚑</span>
+                  <span class="view-label">VIEW →</span>
+                </div>
+              </div>
+            </button>
+          </article>
+
+          <article class="product-card" data-id="4">
+            <button class="product-open" type="button" data-open="4">
+              <img src="" alt="DEBUGGER PIN" class="product-image" />
+              <div class="product-content">
+                <h3>DEBUGGER PIN</h3>
+                <p class="product-description">
+                  Wear this when your code works for absolutely no reason.
+                </p>
+                <div class="product-footer">
+                  <span class="flag-price">12 FLAGS ⚑</span>
+                  <span class="view-label">VIEW →</span>
+                </div>
+              </div>
+            </button>
+          </article>
+        </div>
+      </section>
+
+      <section class="product-details section" id="productDetails" hidden>
+        <button class="back-button" id="backToShop" type="button">
+          ← BACK TO SHOP
+        </button>
+
+        <div class="details-layout">
+          <img src="" alt="PEN-TEST STICKERS" class="product-image" />
+          <div class="details-content">
+            <h2 id="detailsName">PRODUCT NAME</h2>
+            <p class="details-price" id="detailsPrice">08 FLAGS ⚑</p>
+            <p class="details-description" id="detailsDescription"></p>
+            <p class="stock-note" id="stockNote"></p>
+
+            <div class="quantity-field">
+              <label for="quantity">QUANTITY</label>
+              <div class="quantity-control">
+                <button
+                  type="button"
+                  id="decreaseQuantity"
+                  aria-label="Decrease quantity"
+                >
+                  −
+                </button>
+                <input id="quantity" type="number" min="1" value="1" />
+                <button
+                  type="button"
+                  id="increaseQuantity"
+                  aria-label="Increase quantity"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            <div class="flag-message" id="flagMessage" aria-live="polite"></div>
+
+            <form id="orderForm">
+              <p class="eyebrow address-heading">DELIVERY DETAILS</p>
+
+              <label for="fullName">FULL NAME</label>
+              <input
+                id="fullName"
+                name="full_name"
+                autocomplete="name"
+                required
+              />
+
+              <label for="address">SHIPPING ADDRESS</label>
+              <textarea
+                id="address"
+                name="address"
+                autocomplete="street-address"
+                rows="3"
+                required
+              ></textarea>
+
+              <div class="form-grid">
+                <div>
+                  <label for="city">CITY</label>
+                  <input
+                    id="city"
+                    name="city"
+                    autocomplete="address-level2"
+                    required
+                  />
+                </div>
+                <div>
+                  <label for="postalCode">POSTAL CODE</label>
+                  <input
+                    id="postalCode"
+                    name="postal_code"
+                    autocomplete="postal-code"
+                    required
+                  />
+                </div>
+              </div>
+
+              <button class="order-button" id="orderButton" type="submit">
+                ORDER FOR 08 FLAGS ⚑
+              </button>
+              <p class="form-footnote">
+                Flags are deducted only when an order is successfully placed.
+              </p>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <section class="orders-section section" id="orders">
+        <div class="section-heading">
+          <div>
+            <h2>YOUR <span>ORDER.</span></h2>
+          </div>
+        </div>
+
+        <div class="orders-list" id="ordersList">
+          <div class="orders-empty">
+            <span>NO ORDERS YET</span>
+            <p>Place an order to see it here.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <strong>PEN-TEST</strong>
+      <p>MADE WITH ♡ BY TEENS, FOR TEENS</p>
+    </footer>
+
+    <script>
+      /*
+    BACKEND API CONTRACT
+
+    GET  /api/shop/products
+         Expected: { "products": [{ "id": 1, "name": "...",
+           "price": 8, "stock": 30, "description": "..." }] }
+
+    GET  /api/shop/balance
+         Expected: { "balance": 35 }
+
+    GET  /api/shop/orders
+         Expected: { "orders": [...] }
+
+    POST /api/shop/orders
+         Request:
+         {
+           "product_id": 1,
+           "quantity": 2,
+           "full_name": "...",
+           "address": "...",
+           "city": "...",
+           "postal_code": "..."
+         }
+
+         Expected: { "order": {...}, "balance": 19 }
+
+    The server must validate the user, price, stock, balance,
+    and delivery details. These endpoints are an agreed contract;
+    the backend developer must implement them in Flask.
+  */
+
+      const API = {
+        products: "/api/shop/products",
+        balance: "/api/shop/balance",
+        orders: "/api/shop/orders",
+      };
+
+      const products = [
+        {
+          id: 1,
+          name: "PEN-TEST STICKERS",
+          price: 8,
+          stock: 30,
+          description: "Cool Stickers!!",
+        },
+        {
+          id: 2,
+          name: "THE CYBER PACK",
+          price: 15,
+          stock: 15,
+          description: "A pack full of cybers :D",
+        },
+        {
+          id: 3,
+          name: "BUILDER KIT",
+          price: 25,
+          stock: 8,
+          description: "Build for builders.",
+        },
+        {
+          id: 4,
+          name: "DEBUGGER PIN",
+          price: 12,
+          stock: 20,
+          description:
+            "Wear this when your code works for absolutely no reason.",
+        },
+      ];
+
+      let balance = 35;
+      let selectedProduct = null;
+      let orders = [];
+      let isSubmitting = false;
+
+      const $ = (id) => document.getElementById(id);
+
+      function renderProducts() {
+        const query = $("productSearch").value.trim().toLowerCase();
+        const sort = $("productSort").value;
+        const grid = $("productGrid");
+
+        const visibleProducts = products.filter((product) =>
+          `${product.name} ${product.description}`
+            .toLowerCase()
+            .includes(query),
+        );
+
+        if (sort === "low") {
+          visibleProducts.sort((a, b) => a.price - b.price);
+        } else if (sort === "high") {
+          visibleProducts.sort((a, b) => b.price - a.price);
+        } else {
+          visibleProducts.sort((a, b) => a.id - b.id);
+        }
+
+        const visibleIds = new Set(
+          visibleProducts.map((product) => product.id),
+        );
+
+        grid.querySelectorAll(".product-card").forEach((card) => {
+          card.hidden = !visibleIds.has(Number(card.dataset.id));
+        });
+
+        visibleProducts.forEach((product) => {
+          const card = grid.querySelector(`[data-id="${product.id}"]`);
+
+          if (card) {
+            grid.appendChild(card);
+          }
+        });
+      }
+
+      function showDetails(show) {
+        $("shop").hidden = show;
+        $("productDetails").hidden = !show;
+
+        const target = show ? $("productDetails") : $("shop");
+
+        target.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
+
+      function openProduct(id) {
+        const product = products.find((item) => item.id === id);
+
+        if (!product) return;
+
+        selectedProduct = product;
+
+        $("detailsName").textContent = product.name;
+        $("detailsPrice").textContent = `${product.price} FLAGS ⚑ / ITEM`;
+
+        $("detailsDescription").textContent = product.description;
+
+        $("stockNote").hidden = true;
+        $("stockNote").textContent = "";
+
+        $("quantity").value = 1;
+
+        $("orderForm").reset();
+        $("quantity").value = 1;
+
+        updateFlagMessage();
+        showDetails(true);
+      }
+
+      function updateFlagMessage() {
+        if (!selectedProduct) return;
+
+        const quantityInput = $("quantity");
+        const quantity = Number(quantityInput.value);
+
+        const validQuantity = Number.isInteger(quantity) && quantity >= 1;
+
+        const total = validQuantity ? selectedProduct.price * quantity : 0;
+
+        const inStock = validQuantity && quantity <= selectedProduct.stock;
+
+        const enoughFlags = validQuantity && total <= balance;
+
+        const canOrder =
+          selectedProduct.stock > 0 &&
+          validQuantity &&
+          inStock &&
+          enoughFlags &&
+          !isSubmitting;
+
+        const message = $("flagMessage");
+
+        if (selectedProduct.stock <= 0) {
+          message.textContent = "THIS ITEM IS OUT OF STOCK.";
+          message.className = "flag-message warning";
+        } else if (!validQuantity) {
+          message.textContent = "PLEASE ENTER A VALID QUANTITY.";
+          message.className = "flag-message warning";
+        } else if (!inStock) {
+          message.textContent = `ONLY ${selectedProduct.stock} ITEMS ARE AVAILABLE.`;
+          message.className = "flag-message warning";
+        } else if (!enoughFlags) {
+          message.textContent = `YOU NEED ${total - balance} MORE FLAGS TO UNLOCK THIS.`;
+          message.className = "flag-message warning";
+        } else {
+          message.textContent = `✓ YOU HAVE ENOUGH FLAGS. TOTAL: ${total} FLAGS.`;
+          message.className = "flag-message success";
+        }
+
+        $("orderButton").disabled = !canOrder;
+
+        if (isSubmitting) {
+          $("orderButton").textContent = "PLACING ORDER...";
+        } else if (selectedProduct.stock <= 0) {
+          $("orderButton").textContent = "OUT OF STOCK";
+        } else if (!validQuantity || !inStock) {
+          $("orderButton").textContent = "CHECK QUANTITY";
+        } else if (!enoughFlags) {
+          $("orderButton").textContent = `NEED ${total - balance} MORE FLAGS`;
+        } else {
+          $("orderButton").textContent = `ORDER FOR ${total} FLAGS ⚑`;
+        }
+      }
+
+      function renderOrders() {
+        const container = $("ordersList");
+        container.replaceChildren();
+
+        if (!orders.length) {
+          const empty = document.createElement("div");
+          empty.className = "orders-empty";
+
+          const title = document.createElement("span");
+          title.textContent = "NO ORDERS YET";
+
+          const description = document.createElement("p");
+          description.textContent =
+            "Your future loot will appear here. Go make some questionable purchases.";
+
+          empty.append(title, description);
+          container.appendChild(empty);
+          return;
+        }
+
+        const statuses = {
+          pending: "ORDER PLACED",
+          placed: "ORDER PLACED",
+          processing: "PROCESSING",
+          shipped: "ON ITS WAY",
+          shipping: "ON ITS WAY",
+          delivered: "DELIVERED",
+          cancelled: "CANCELLED",
+        };
+
+        orders.forEach((order) => {
+          const card = document.createElement("article");
+          card.className = "order-card";
+
+          const info = document.createElement("div");
+          info.className = "order-info";
+
+          const eyebrow = document.createElement("p");
+          eyebrow.className = "eyebrow";
+          eyebrow.textContent = `ORDER #${order.id}`;
+
+          const name = document.createElement("h3");
+          name.textContent = order.product_name || order.name || "Product";
+
+          const meta = document.createElement("p");
+          meta.className = "order-meta";
+          meta.textContent = `QUANTITY: ${order.quantity} / ${order.total} FLAGS`;
+
+          const status = String(order.status || "pending").toLowerCase();
+          const statusLabel = statuses[status] || "STATUS UNKNOWN";
+
+          const current = document.createElement("p");
+          current.className = "order-current";
+          current.textContent = `STATUS: ${statusLabel}`;
+
+          info.append(eyebrow, name, meta, current);
+          card.appendChild(info);
+          container.appendChild(card);
+        });
+      }
+
+      async function placeOrder(orderData) {
+        /*
+      Replace this demo implementation with a POST request to:
+      POST /api/shop/orders
+    */
+
+        const product = products.find(
+          (item) => item.id === orderData.product_id,
+        );
+
+        if (!product) {
+          throw new Error("Product not found.");
+        }
+
+        const total = product.price * orderData.quantity;
+
+        // Simulate server-side validation for the frontend demo.
+        if (orderData.quantity > product.stock) {
+          throw new Error("Not enough stock available.");
+        }
+
+        if (total > balance) {
+          throw new Error("You don't have enough flags.");
+        }
+
+        balance -= total;
+        product.stock -= orderData.quantity;
+
+        return {
+          order: {
+            id: String(Date.now()).slice(-6),
+            product_id: product.id,
+            product_name: product.name,
+            quantity: orderData.quantity,
+            total,
+            status: "pending",
+          },
+          balance,
+        };
+      }
+
+      $("orderForm").addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        if (!selectedProduct || isSubmitting) return;
+
+        const quantity = Number($("quantity").value);
+
+        if (
+          !Number.isInteger(quantity) ||
+          quantity < 1 ||
+          quantity > selectedProduct.stock ||
+          quantity * selectedProduct.price > balance
+        ) {
+          updateFlagMessage();
+          return;
+        }
+
+        const orderData = {
+          product_id: selectedProduct.id,
+          quantity,
+          full_name: $("fullName").value.trim(),
+          address: $("address").value.trim(),
+          city: $("city").value.trim(),
+          postal_code: $("postalCode").value.trim(),
+        };
+
+        if (
+          !orderData.full_name ||
+          !orderData.address ||
+          !orderData.city ||
+          !orderData.postal_code
+        ) {
+          $("flagMessage").textContent =
+            "PLEASE COMPLETE ALL DELIVERY DETAILS.";
+          $("flagMessage").className = "flag-message warning";
+          return;
+        }
+
+        isSubmitting = true;
+        updateFlagMessage();
+
+        try {
+          const result = await placeOrder(orderData);
+
+          balance = result.balance;
+          orders.unshift(result.order);
+          $("stockNote").hidden = true;
+          $("stockNote").textContent = "";
+
+          renderProducts();
+          renderOrders();
+
+          $("orderForm").reset();
+          $("quantity").value = 1;
+
+          showDetails(false);
+          $("orders").scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        } catch (error) {
+          $("flagMessage").textContent =
+            error.message || "COULD NOT PLACE ORDER.";
+
+          $("flagMessage").className = "flag-message warning";
+        } finally {
+          isSubmitting = false;
+          updateFlagMessage();
+        }
+      });
+
+      $("productGrid").addEventListener("click", (event) => {
+        const button = event.target.closest("[data-open]");
+
+        if (button) {
+          openProduct(Number(button.dataset.open));
+        }
+      });
+
+      $("productSearch").addEventListener("input", renderProducts);
+      $("productSort").addEventListener("change", renderProducts);
+
+      $("backToShop").addEventListener("click", () => {
+        showDetails(false);
+      });
+
+      $("decreaseQuantity").addEventListener("click", () => {
+        const quantity = Number($("quantity").value) || 1;
+        $("quantity").value = Math.max(1, quantity - 1);
+        updateFlagMessage();
+      });
+
+      $("increaseQuantity").addEventListener("click", () => {
+        const quantity = Number($("quantity").value) || 1;
+        $("quantity").value = Math.max(1, quantity + 1);
+        updateFlagMessage();
+      });
+
+      $("quantity").addEventListener("input", updateFlagMessage);
+
+      renderProducts();
+      renderOrders();
+    </script>
+  </body>
+</html>

@@ -28,8 +28,8 @@
       <a href="/" class="nav-logo">PEN-TEST</a>
       <div class="nav-links">
         <a href="#projects">PROJECTS</a>
-        <a href="#shop">SHOP</a>
-        <a href="#community">COMMUNITY</a>
+        <a href="{{ url_for('community') }}">COMMUNITY</a>
+        <a href="{{ url_for('shop') }}">SHOP</a>
       </div>
       <form action="{{ url_for('logout') }}" method="post">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -43,7 +43,9 @@
           <div>
             <p class="tiny">WELCOME BACK, BUILDER</p>
             <h1>
-              ESCAPE <span class="red">YOUR</span> FATE<span class="red">.</span>
+              ESCAPE <span class="red">YOUR</span> FATE<span class="red"
+                >.</span
+              >
             </h1>
             <a href="#mission" class="red-button">GUIDE</a>
           </div>

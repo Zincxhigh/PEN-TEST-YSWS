@@ -1,0 +1,378 @@
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PEN-TEST | Community</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles/community.css') }}"
+    />
+    <link rel="icon" href="{{ url_for('static', filename='logo.ico') }}" />
+  </head>
+
+  <body>
+    <nav class="navbar">
+      <a href="/" class="nav-logo">PEN-TEST</a>
+      <div class="nav-links">
+        <a href="{{ url_for('dashboard') }}">DASHBOARD</a>
+        <a href="" aria-current="page">PROJECTS</a>
+        <a href="{{ url_for('shop') }}">SHOP</a>
+      </div>
+
+      <form action="{{ url_for('logout') }}" method="post">
+        <button class="logout" type="submit">LOGOUT</button>
+      </form>
+    </nav>
+
+    <main>
+      <section class="projects section" id="projects">
+        <div class="section-heading">
+          <div> <h2>PROJECTS</h2> </div>
+          <p class="section-note">   Built by curious minds. Explore the experiments, uncover the ideas. </p>
+        </div>
+
+        <div class="toolbar">
+          <label class="search">
+            <span class="search-icon" aria-hidden="true">⌕</span>
+
+            <input
+              type="search"
+              id="projectSearch"
+              placeholder="SEARCH PROJECTS, CREATORS, TECH..."
+              aria-label="Search projects"
+            />
+
+            <span class="search-hint">ENTER QUERY</span>
+          </label>
+        </div>
+
+        <div class="results-bar">
+          <span>
+            <span class="status-dot"></span>
+            PROJECT DATABASE
+          </span>
+
+          <span>
+            RESULTS:
+            <strong id="resultsCount">000</strong>
+          </span>
+        </div>
+
+        <div class="project-grid" id="projectGrid">
+          {% for project in projects %}
+          <article
+            class="project-card {{ project.card_color or 'red' }}"
+            data-name="{{ project.name | default('', true) | e }}"
+            data-creator="{{ project.creator_name | default('community', true) | e }}"
+            data-category="{{ project.category | default('OTHER', true) | e }}"
+            data-description="{{ project.description | default('', true) | e }}"
+            data-tech="{{ project.technologies | join(', ') if project.technologies else '' }}"
+            data-image="{{ project.image_url | default('', true) | e }}"
+            data-github="{{ project.github_url | default('', true) | e }}"
+            data-live="{{ project.live_url | default('', true) | e }}"
+          >
+            <button
+              class="card-open"
+              type="button"
+              aria-label="View {{ project.name }} details"
+            >
+              <div class="card-visual">
+                <div class="visual-grid"></div>
+
+                {% if project.image_url %}
+                <img
+                  class="project-image"
+                  src="{{ project.image_url }}"
+                  alt="{{ project.name }} preview"
+                  loading="lazy"
+                />
+                {% endif %}
+
+                <span class="visual-symbol" aria-hidden="true">
+                  {% if project.card_color == 'yellow' %}✳{% elif
+                  project.card_color == 'green' %}⌘{% else %}+{% endif %}
+                </span>
+
+                <span class="project-category">
+                  {{ project.category or 'OTHER' }}
+                </span>
+              </div>
+
+              <div class="card-content">
+                <div class="card-meta">
+                  <span>COMMUNITY BUILD</span>
+                  <span class="card-arrow" aria-hidden="true">↗</span>
+                </div>
+
+                <h3>{{ project.name }}</h3>
+
+                <p class="card-description">{{ project.description }}</p>
+
+                <div class="card-footer">
+                  <span class="creator">
+                    <span class="creator-icon">@</span>{{ project.creator_name }}
+                  </span>
+
+                  <span class="view-label">VIEW BUILD ↗</span>
+                </div>
+              </div>
+            </button>
+          </article>
+          {% else %}
+          <div class="empty-state" id="emptyProjects">
+            <span class="empty-symbol">[ _ ]</span>
+            <h3>NO BUILDS YET.</h3>
+            <p>Be the first to add a project to the community.</p>
+          </div>
+          {% endfor %}
+
+          <div class="no-results" id="noResults" hidden>
+            <span>[ ! ]</span>
+            <h3>NO BUILDS FOUND.</h3>
+            <p>Try another search query.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="submit-section">
+        <div class="submit-content">
+          <h2>
+            BUILT<br />
+            SOMETHING<br />
+            <span class="red-text">COOL?</span>
+          </h2>
+
+          <p>
+            Your side project deserves to exist outside your local machine. Show
+            the community what you've been working on.
+          </p>
+
+          <a
+            href=""
+            class="submit-button"
+            id="submitProjectButton"
+          >
+            SUBMIT YOUR PROJECT 
+          </a>
+        </div>
+
+        <div class="submit-art" aria-hidden="true">
+          <div class="art-frame">
+            <span class="art-corner top-left">+</span>
+            <span class="art-corner top-right">+</span>
+            <span class="art-corner bottom-left">+</span>
+            <span class="art-corner bottom-right">+</span>
+
+            <div class="art-face">: )</div>
+            <p class="art-caption">BUILD / BREAK / REPEAT</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div class="modal-backdrop" id="projectModal" hidden>
+      <section
+        class="project-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modalTitle"
+      >
+        <button
+          class="modal-close"
+          id="modalClose"
+          type="button"
+          aria-label="Close project details"
+        >
+          ×
+        </button>
+
+        <div class="modal-visual">
+          <img id="modalImage" alt="" hidden />
+          <span id="modalVisualFallback" class="modal-fallback">✳</span>
+          <span class="modal-image-tag">PROJECT_PREVIEW</span>
+        </div>
+
+        <div class="modal-content">
+          <p class="eyebrow">PROJECT_DETAILS / OPENED</p>
+          <h2 id="modalTitle">PROJECT NAME</h2>
+          <p class="modal-creator" id="modalCreator"></p>
+          <p class="modal-description" id="modalDescription"></p>
+
+          <div class="modal-tech">
+            <span>BUILT WITH</span>
+            <p id="modalTech">Technologies</p>
+          </div>
+
+          <div class="modal-actions">
+            <a
+              href="#"
+              class="modal-button primary"
+              id="modalGithub"
+              target="_blank"
+              rel="noopener noreferrer"
+              hidden
+            >
+              SOURCE CODE ↗
+            </a>
+
+            <a
+              href="#"
+              class="modal-button secondary"
+              id="modalLive"
+              target="_blank"
+              rel="noopener noreferrer"
+              hidden
+            >
+              LIVE DEMO ↗
+            </a>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <footer>
+      <strong>PEN-TEST</strong>
+      <p>MADE WITH ♡ BY TEENS, FOR TEENS</p>
+    </footer>
+
+    <script>
+      const cards = [...document.querySelectorAll(".project-card")];
+      const searchInput = document.getElementById("projectSearch");
+      const resultsCount = document.getElementById("resultsCount");
+      const noResults = document.getElementById("noResults");
+
+      const modal = document.getElementById("projectModal");
+      const modalClose = document.getElementById("modalClose");
+      const modalTitle = document.getElementById("modalTitle");
+      const modalCreator = document.getElementById("modalCreator");
+      const modalDescription = document.getElementById("modalDescription");
+      const modalTech = document.getElementById("modalTech");
+      const modalImage = document.getElementById("modalImage");
+      const modalFallback = document.getElementById("modalVisualFallback");
+      const modalGithub = document.getElementById("modalGithub");
+      const modalLive = document.getElementById("modalLive");
+
+      let previousFocus = null;
+
+      function filterProjects() {
+        const query = searchInput.value.trim().toLowerCase();
+        let visibleCount = 0;
+
+        cards.forEach((card) => {
+          const searchable = [
+            card.dataset.name,
+            card.dataset.creator,
+            card.dataset.description,
+            card.dataset.category,
+            card.dataset.tech,
+          ]
+            .join(" ")
+            .toLowerCase();
+
+          const matches = searchable.includes(query);
+          card.hidden = !matches;
+
+          if (matches) visibleCount++;
+        });
+
+        resultsCount.textContent = String(visibleCount).padStart(3, "0");
+        noResults.hidden = visibleCount !== 0 || cards.length === 0;
+      }
+
+      function setProjectLink(element, url) {
+        const safeUrl = (url || "").trim();
+
+        if (
+          safeUrl &&
+          (safeUrl.startsWith("https://") || safeUrl.startsWith("http://"))
+        ) {
+          element.href = safeUrl;
+          element.hidden = false;
+        } else {
+          element.removeAttribute("href");
+          element.hidden = true;
+        }
+      }
+
+      function openProject(card) {
+        const data = card.dataset;
+        previousFocus = document.activeElement;
+
+        modalTitle.textContent = data.name || "Untitled project";
+        modalCreator.textContent =
+          "CREATED BY @" + (data.creator || "COMMUNITY");
+        modalDescription.textContent =
+          data.description || "No description provided.";
+        modalTech.textContent = data.tech || "Not specified";
+
+        modalImage.onerror = null;
+        modalImage.removeAttribute("src");
+        modalImage.alt = "";
+
+        if (data.image) {
+          modalImage.src = data.image;
+          modalImage.alt = (data.name || "Project") + " preview";
+          modalImage.hidden = false;
+          modalFallback.hidden = true;
+
+          modalImage.onerror = () => {
+            modalImage.hidden = true;
+            modalFallback.hidden = false;
+          };
+        } else {
+          modalImage.hidden = true;
+          modalFallback.hidden = false;
+        }
+
+        setProjectLink(modalGithub, data.github);
+        setProjectLink(modalLive, data.live);
+
+        modal.hidden = false;
+        document.body.classList.add("modal-open");
+        modalClose.focus();
+      }
+
+      function closeProject() {
+        modal.hidden = true;
+        document.body.classList.remove("modal-open");
+
+        if (previousFocus) {
+          previousFocus.focus();
+        }
+      }
+
+      cards.forEach((card) => {
+        card.querySelector(".card-open").addEventListener("click", () => {
+          openProject(card);
+        });
+      });
+
+      searchInput.addEventListener("input", filterProjects);
+      modalClose.addEventListener("click", closeProject);
+
+      modal.addEventListener("click", (event) => {
+        if (event.target === modal) {
+          closeProject();
+        }
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && !modal.hidden) {
+          closeProject();
+        }
+      });
+
+      filterProjects();
+    </script>
+  </body>
+</html>

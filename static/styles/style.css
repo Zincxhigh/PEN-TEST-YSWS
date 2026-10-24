@@ -1,44 +1,31 @@
-
 * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 html {
-    scroll-behavior: smooth;
-    scroll-padding-top: 90px;
+  scroll-behavior: smooth;
+  scroll-padding-top: 90px;
 }
 
 body {
-    background: #050505;
-    color: #fff;
-    font-family: "Space Mono", monospace;
-    font-size: 15px;
-    line-height: 1.7;
+  background: #050505;
+  color: #ffffff;
+  font-family: "Space Mono", monospace;
+  font-size: 16px;
+  line-height: 1.7;
+  overflow-x: hidden;
 }
 
 a {
-    color: inherit;
-    text-decoration: none;
-}
-
-button,
-input,
-textarea {
-    font: inherit;
+  color: inherit;
+  text-decoration: none;
 }
 
 button {
-    cursor: pointer;
+  font: inherit;
 }
-
-img {
-    display: block;
-    height: auto;
-    max-width: 100%;
-}
-
 .navbar {
     align-items: center;
     background: #050505;

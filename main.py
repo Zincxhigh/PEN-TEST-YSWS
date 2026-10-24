@@ -182,9 +182,26 @@ def logout():
 def dashboard():
     return render_template("dashboard.html")
 
+@app.route("/community")
+@login_required
+def community():
+    return render_template("community.html")
+
+
+@app.route("/shop")
+@login_required
+def shop():
+    return render_template("shop.html")
+
+
+@app.route("/admin-orders")
+def admin_orders():
+    return render_template("admin-orders.html")
+
 
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
