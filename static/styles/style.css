@@ -26,6 +26,7 @@ a {
 button {
   font: inherit;
 }
+
 .navbar {
     align-items: center;
     background: #050505;
@@ -298,6 +299,103 @@ button {
     font-size: 14px;
 }
 
+.challenge-shell {
+    max-width: 920px;
+}
+
+.challenge-panel {
+    background: #0b0b0b;
+    border: 1px solid #292929;
+    box-shadow: inset 0 0 0 1px rgba(255, 48, 48, 0.16), 0 0 22px rgba(255, 48, 48, 0.08);
+    padding: 28px;
+    position: relative;
+}
+
+.challenge-panel::before {
+    background: linear-gradient(90deg, transparent, rgba(255, 48, 48, 0.18), transparent);
+    content: "";
+    height: 1px;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+.challenge-header {
+    align-items: center;
+    border-bottom: 1px solid #292929;
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+}
+
+.challenge-badge {
+    color: #ff3030;
+    font-size: 12px;
+    letter-spacing: 2px;
+}
+
+#flag-bank {
+    color: #b7f34a;
+    font-family: "Press Start 2P", cursive;
+    font-size: 12px;
+}
+
+.challenge-copy {
+    color: #999;
+    font-size: 14px;
+    margin-bottom: 18px;
+}
+
+.challenge-copy strong {
+    color: #fff;
+}
+
+.challenge-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 18px;
+}
+
+.challenge-form input {
+    background: #050505;
+    border: 1px solid #292929;
+    color: #fff;
+    flex: 1;
+    font: inherit;
+    min-width: 220px;
+    padding: 14px 16px;
+}
+
+.challenge-form input:focus {
+    border-color: #ff3030;
+    outline: none;
+}
+
+.challenge-flags {
+    display: grid;
+    gap: 12px;
+    list-style: none;
+    margin-top: 22px;
+}
+
+.flag-item {
+    border: 1px solid #292929;
+    color: #999;
+    font-size: 14px;
+    padding: 12px 14px;
+    transition: border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.flag-item.unlocked {
+    border-color: #b7f34a;
+    box-shadow: inset 0 0 0 1px rgba(183, 243, 74, 0.3);
+    color: #b7f34a;
+}
+
 .faq-container {
     max-width: 850px;
 }
@@ -454,6 +552,15 @@ footer strong {
 
     .step-number {
         font-size: 12px;
+    }
+
+    .challenge-panel {
+        padding: 21px;
+    }
+
+    .challenge-header {
+        align-items: flex-start;
+        flex-direction: column;
     }
 
     .final {
