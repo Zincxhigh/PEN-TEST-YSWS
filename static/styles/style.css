@@ -27,6 +27,19 @@ button {
   font: inherit;
 }
 
+.demo-banner {
+    background: linear-gradient(90deg, #ff3030, #a00000);
+    border-bottom: 1px solid #ff9090;
+    color: #fff;
+    font-family: "Press Start 2P", cursive;
+    font-size: 10px;
+    letter-spacing: 2px;
+    padding: 12px 5%;
+    text-align: center;
+    text-transform: uppercase;
+    width: 100%;
+}
+
 .navbar {
     align-items: center;
     background: #050505;
@@ -488,6 +501,12 @@ footer strong {
 }
 
 @media (max-width: 600px) {
+    .demo-banner {
+        font-size: 8px;
+        letter-spacing: 1.2px;
+        padding: 10px 4%;
+    }
+
     .navbar {
         align-items: flex-start;
         flex-direction: column;
