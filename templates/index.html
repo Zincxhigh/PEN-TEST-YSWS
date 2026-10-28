@@ -14,7 +14,7 @@
         rel="stylesheet">
 
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
-       <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='logo.ico') }}">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='logo.ico') }}">
 </head>
 
 <body>
@@ -39,9 +39,8 @@
         <a href="/play" class="nav-button">ENTER CTF →</a>
     </nav>
 
-     <img src="{{ url_for('static', filename='images/flag-orpheus-left.svg') }}"
-                alt="PEN-TEST - Escape Your Fate">
-
+    <img src="{{ url_for('static', filename='images/flag-orpheus-left.svg') }}"
+        alt="PEN-TEST - Escape Your Fate">
 
     <header class="hero">
         <div class="hero-logo">
@@ -63,7 +62,6 @@
         </div>
     </header>
 
-
     <section class="section about" id="about">
         <div class="section-heading">
             <h2>LEARN BY <strong>BUILDING.</strong> </h2>
@@ -83,12 +81,10 @@
         </div>
     </section>
 
-
     <section class="section" id="explore">
         <div class="section-heading">
             <h2>WHAT WILL YOU<strong> BUILD?</strong></h2>
         </div>
-
 
         <div class="cards">
             <article class="card">
@@ -113,7 +109,6 @@
                 </p>
             </article>
 
-
             <article class="card">
                 <div class="card-heading">
                     <span class="card-number">03</span>
@@ -124,7 +119,6 @@
                     information and communications.
                 </p>
             </article>
-
 
             <article class="card">
                 <div class="card-heading">
@@ -137,7 +131,6 @@
                 </p>
             </article>
 
-
             <article class="card">
                 <div class="card-heading">
                     <span class="card-number">05</span>
@@ -148,7 +141,6 @@
                     analyzed during investigations.
                 </p>
             </article>
-
 
             <article class="card">
                 <div class="card-heading">
@@ -162,7 +154,6 @@
             </article>
         </div>
     </section>
-
 
     <section class="section tools-section">
         <div class="section-heading">
@@ -181,19 +172,16 @@
             <div class="tool">+</div>
         </div>
 
-
         <p class="tool-note">
             Tools are explored for ethical learning,
             defensive research, and authorized testing.
         </p>
     </section>
 
-
     <section class="section" id="how-it-works">
         <div class="section-heading">
             <h2>HOW IT <strong>WORKS.</strong> </h2>
         </div>
-
 
         <div class="steps">
             <div class="step">
@@ -207,7 +195,6 @@
                 </div>
             </div>
 
-
             <div class="step">
                 <div class="step-number"> 02 </div>
                 <div>
@@ -219,7 +206,6 @@
                 </div>
             </div>
 
-
             <div class="step">
                 <div class="step-number">03</div>
                 <div>
@@ -230,7 +216,6 @@
                     </p>
                 </div>
             </div>
-
 
             <div class="step">
                 <div class="step-number">04</div>
@@ -244,7 +229,6 @@
             </div>
         </div>
     </section>
-
 
     <section class="section" id="arena">
         <div class="section-heading">
@@ -278,6 +262,38 @@
         <p class="tool-note" id="ctfd-status">Checking arena status…</p>
     </section>
 
+    <section class="section" id="challenge-demo">
+        <div class="section-heading">
+            <h2>DEMO <strong>CTF ROOM</strong></h2>
+            <p>One room, multiple flags, and more FLAG currency when you complete it.</p>
+        </div>
+
+        <div class="challenge-shell">
+            <div class="challenge-panel">
+                <div class="challenge-header">
+                    <span class="challenge-badge">FLAG BANK</span>
+                    <strong id="flag-bank">0 FLAG</strong>
+                </div>
+
+                <p class="challenge-copy">
+                    Complete the room and unlock more FLAG currency for the YSWS. Each correct flag adds 50 FLAG.
+                </p>
+
+                <form id="ctf-form" class="challenge-form">
+                    <input id="ctf-input" type="text" placeholder="Enter flag" aria-label="Enter challenge flag">
+                    <button type="submit" class="button primary-button">Submit</button>
+                </form>
+
+                <p class="tool-note" id="ctf-status">0/3 flags unlocked</p>
+
+                <ul id="challenge-flags" class="challenge-flags">
+                    <li class="flag-item locked">Flag 1: Locked</li>
+                    <li class="flag-item locked">Flag 2: Locked</li>
+                    <li class="flag-item locked">Flag 3: Locked</li>
+                </ul>
+            </div>
+        </div>
+    </section>
 
     <section class="faq-section" id="faq">
         <div class="section-heading">
@@ -344,12 +360,11 @@
         </div>
     </section>
 
-
     <section class="final">
-            <h2>READY TO<br /><span>ESCAPE?</span></h2>
+        <h2>READY TO<br /><span>ESCAPE?</span></h2>
 
-            <a href="https://rsvp.soon.it/pen-test" class="button primary-button"> RSVP NOW → </a>
-            <a href="/play" class="button secondary-button">Enter CTF Arena</a>
+        <a href="https://rsvp.soon.it/pen-test" class="button primary-button"> RSVP NOW → </a>
+        <a href="/play" class="button secondary-button">Enter CTF Arena</a>
     </section>
 
     <footer>
@@ -358,6 +373,82 @@
     </footer>
 
     <script>
+        const challengeFlags = [
+            "PEN-TEST{ESCAPE_YOUR_FATE}",
+            "PEN-TEST{BUILD_LEARN_GROW}",
+            "PEN-TEST{HACK_CLUB_TEAM}"
+        ];
+        const storageKey = "pen-test-demo-ctf";
+        const bankKey = "pen-test-demo-bank";
+
+        function readProgress() {
+            try {
+                const raw = JSON.parse(localStorage.getItem(storageKey) || "[]");
+                return Array.isArray(raw) ? raw : [];
+            } catch {
+                return [];
+            }
+        }
+
+        function updateChallengeUI() {
+            const unlocked = new Set(readProgress());
+            const items = document.querySelectorAll("#challenge-flags .flag-item");
+            items.forEach((item, index) => {
+                const flag = challengeFlags[index];
+                if (unlocked.has(flag)) {
+                    item.classList.remove("locked");
+                    item.classList.add("unlocked");
+                    item.textContent = `Flag ${index + 1}: ${flag}`;
+                } else {
+                    item.classList.add("locked");
+                    item.classList.remove("unlocked");
+                    item.textContent = `Flag ${index + 1}: Locked`;
+                }
+            });
+
+            const totalUnlocked = unlocked.size;
+            const bank = totalUnlocked * 50;
+            const flagBank = document.getElementById("flag-bank");
+            if (flagBank) {
+                flagBank.textContent = `${bank} FLAG`;
+            }
+
+            const status = document.getElementById("ctf-status");
+            if (status) {
+                status.textContent = `${totalUnlocked}/${challengeFlags.length} flags unlocked`;
+                status.style.color = totalUnlocked === challengeFlags.length ? "#b7f34a" : "#999";
+                if (totalUnlocked === challengeFlags.length) {
+                    status.textContent = `Room complete — ${bank} FLAG earned!`;
+                }
+            }
+
+            localStorage.setItem(bankKey, String(bank));
+        }
+
+        document.getElementById("ctf-form")?.addEventListener("submit", function (event) {
+            event.preventDefault();
+            const input = document.getElementById("ctf-input");
+            const guess = (input?.value || "").trim();
+            const current = new Set(readProgress());
+            const matched = challengeFlags.find(flag => flag.toUpperCase() === guess.toUpperCase());
+
+            if (matched) {
+                current.add(matched);
+                localStorage.setItem(storageKey, JSON.stringify([...current]));
+                input.value = "";
+                input.placeholder = "Flag unlocked";
+                updateChallengeUI();
+            } else {
+                const status = document.getElementById("ctf-status");
+                if (status) {
+                    status.textContent = "Incorrect flag — try again.";
+                    status.style.color = "#ff3030";
+                }
+            }
+        });
+
+        updateChallengeUI();
+
         fetch("/api/ctfd/status")
             .then(r => r.json().then(b => ({ ok: r.ok, body: b })))
             .then(({ ok, body }) => {
